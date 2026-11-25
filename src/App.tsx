@@ -770,16 +770,17 @@ export default function App() {
   return (
     <div className="h-[100dvh] flex flex-col bg-[#FAF7F2] text-[#2F2019] overflow-hidden">
       {/* Top Application Header */}
-      <header className="h-[52px] lg:h-[56px] bg-white border-b border-[#EAE0D5] px-4 lg:px-6 flex items-center justify-between gap-4 shrink-0 sticky top-0 z-30">
+      <header className="min-h-[54px] lg:h-[58px] bg-white border-b border-[#EAE0D5] px-4 lg:px-6 py-1.5 flex items-center justify-between gap-3 shrink-0 sticky top-0 z-30">
         <div className="flex items-center gap-2.5 min-w-0">
-          <AkiLogo className="w-8 h-8 shrink-0" />
-          <span className="text-sm sm:text-base font-bold tracking-tight text-[#5C4033] truncate">
-            น้อนอากิ้
-            <span className="hidden sm:inline font-medium text-[#7A6356]">
-              {' '}
-              — ผู้ช่วยส่วนตัวสุดน่ารัก
+          <AkiLogo className="w-8 h-8 sm:w-9 sm:h-9 shrink-0" />
+          <div className="min-w-0 flex flex-col sm:flex-row sm:items-baseline sm:gap-2">
+            <span className="text-sm sm:text-base font-bold tracking-tight text-[#5C4033] truncate leading-tight">
+              น้อนอากิ้
             </span>
-          </span>
+            <span className="text-[11px] sm:text-xs font-medium text-[#7A6356] truncate leading-tight">
+              ผู้ช่วยส่วนตัวสไตล์คาเฟ่
+            </span>
+          </div>
         </div>
 
         {/* Desktop Dashboard Tab Switcher in Header */}

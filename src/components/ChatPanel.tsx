@@ -15,7 +15,6 @@ import {
   QUICK_PROMPTS,
   QuickPromptItem,
 } from '../data/initialData';
-import { AkiLogo } from './AkiLogo';
 import {
   ChatMessage,
   DashboardTab,
@@ -161,21 +160,6 @@ export function ChatPanel({
       aria-label="หน้าต่างแชทกับน้อนอากิ้"
       className="flex flex-col h-full min-h-0 bg-[#FAF7F2] lg:border-r border-[#EAE0D5] overflow-hidden"
     >
-      {/* Chat Panel Subheader */}
-      <div className="px-4 py-3 border-b border-[#EAE0D5] flex items-center justify-between gap-3 shrink-0 bg-white">
-        <div className="flex items-center gap-3 min-w-0">
-          <AkiLogo className="w-10 h-10 shrink-0" />
-          <div className="min-w-0">
-            <h2 className="text-sm font-semibold text-[#2F2019] truncate">
-              น้อนอากิ้
-            </h2>
-            <p className="text-xs text-[#7A6356] truncate">
-              พิมพ์คุย จดค่าข้าว นัดหมาย หรือส่งสลิปให้อากิ้ช่วยจดได้เลยนะคะ
-            </p>
-          </div>
-        </div>
-      </div>
-
       {/* Scrollable Chat History */}
       <div className="flex-1 min-h-0 overflow-y-auto px-4 py-4 space-y-4 bg-[#FAF7F2]">
         {messages.map((msg) => {
