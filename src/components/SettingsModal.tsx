@@ -1,15 +1,44 @@
 import { useEffect, useState } from 'react';
-import { Bell, BellRing, Loader2, LogOut, Mail, Trash2, Volume2, X } from 'lucide-react';
+import {
+  Bell,
+  BellOff,
+  BellRing,
+  CheckCircle2,
+  Download,
+  Loader2,
+  LogOut,
+  Mail,
+  Smartphone,
+  Trash2,
+  Volume2,
+  X,
+} from 'lucide-react';
+import {
+  deletePushSubscriptionDb,
+  hasPushSubscriptionDb,
+  savePushSubscriptionDb,
+} from '../services/supabaseData';
 import { AppSettings } from '../types';
 import {
+  getCurrentPushSubscription,
   getNotificationPermissionState,
+  isIosSafariWithoutStandalone,
+  isWebPushSupported,
   playGentleBell,
   requestBrowserNotificationPermission,
   sendBrowserNotification,
+  subscribeDeviceWebPush,
+  unsubscribeDeviceWebPush,
 } from '../utils/notifications';
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
+}
 
 interface SettingsModalProps {
   open: boolean;
+  userId?: string;
   userEmail?: string;
   settings: AppSettings;
   onClose: () => void;
@@ -21,6 +50,7 @@ interface SettingsModalProps {
 
 export function SettingsModal({
   open,
+  userId,
   userEmail,
   settings,
   onClose,
@@ -36,11 +66,41 @@ export function SettingsModal({
   const [isClearing, setIsClearing] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
 
+  const [pushStatus, setPushStatus] = useState<
+    'checking' | 'subscribed' | 'unsubscribed' | 'unsupported'
+  >('checking');
+  const [pushBusy, setPushBusy] = useState(false);
+  const [pushFeedback, setPushFeedback] = useState<{
+    kind: 'info' | 'error';
+    text: string;
+  } | null>(null);
+
+  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [showIosGuide, setShowIosGuide] = useState(false);
+
+  useEffect(() => {
+    const onBeforeInstall = (e: Event) => {
+      e.preventDefault();
+      setInstallPrompt(e as BeforeInstallPromptEvent);
+    };
+    const onInstalled = () => {
+      setInstallPrompt(null);
+      setShowIosGuide(false);
+    };
+    window.addEventListener('beforeinstallprompt', onBeforeInstall);
+    window.addEventListener('appinstalled', onInstalled);
+    return () => {
+      window.removeEventListener('beforeinstallprompt', onBeforeInstall);
+      window.removeEventListener('appinstalled', onInstalled);
+    };
+  }, []);
+
   useEffect(() => {
     if (!open) {
       setConfirmClear(false);
       setIsClearing(false);
       setIsSigningOut(false);
+      setPushFeedback(null);
       return;
     }
     setPermission(getNotificationPermissionState());
@@ -48,8 +108,32 @@ export function SettingsModal({
       if (e.key === 'Escape') onClose();
     };
     window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
+
+    let cancelled = false;
+    const checkPush = async () => {
+      if (!isWebPushSupported()) {
+        if (!cancelled) setPushStatus('unsupported');
+        return;
+      }
+      setPushStatus('checking');
+      const currentSub = await getCurrentPushSubscription();
+      if (cancelled) return;
+      if (!currentSub || !userId) {
+        setPushStatus('unsubscribed');
+        return;
+      }
+      const savedInDb = await hasPushSubscriptionDb(userId, currentSub.endpoint);
+      if (!cancelled) {
+        setPushStatus(savedInDb ? 'subscribed' : 'unsubscribed');
+      }
+    };
+    void checkPush();
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [open, userId, onClose]);
 
   if (!open) return null;
 
@@ -59,7 +143,7 @@ export function SettingsModal({
       setPermission(result);
       onUpdateSettings({ ...settings, notificationsEnabled: true });
       if (result === 'granted') {
-        sendBrowserNotification(
+        void sendBrowserNotification(
           'น้อนอากิ้เปิดแจ้งเตือนแล้วนะคะน้า~',
           'เมื่อถึงเวลานัดหรือเวลาสรุปยอดประจำวัน เค้าจะกระดิ่งเตือนให้นะคะ',
         );
@@ -74,6 +158,81 @@ export function SettingsModal({
     }
   };
 
+  const handleEnableMobilePush = async () => {
+    if (!userId) {
+      setPushFeedback({ kind: 'error', text: 'กรุณาเข้าสู่ระบบก่อนเปิดรับการแจ้งเตือนบนมือถือนะคะ' });
+      return;
+    }
+    setPushBusy(true);
+    setPushFeedback(null);
+    try {
+      const { subscription, error } = await subscribeDeviceWebPush();
+      setPermission(getNotificationPermissionState());
+      if (error || !subscription) {
+        setPushFeedback({
+          kind: 'error',
+          text: error || 'ไม่สามารถเปิดรับการแจ้งเตือนบนอุปกรณ์นี้ได้ค่ะ',
+        });
+        return;
+      }
+
+      await savePushSubscriptionDb(userId, subscription);
+      setPushStatus('subscribed');
+      onUpdateSettings({ ...settings, notificationsEnabled: true });
+
+      void sendBrowserNotification(
+        'เปิดรับแจ้งเตือนบนมือถือสำเร็จแล้วค่ะน้า~',
+        'แม้อากิ้จะถูกปัดปิดแอปไปแล้ว เมื่อถึงเวลานัดจะมีแจ้งเตือนเด้งขึ้นทันทีเลยค่ะ',
+      );
+      setPushFeedback({
+        kind: 'info',
+        text: 'บันทึกอุปกรณ์นี้ลง Supabase แล้วค่ะ ถึงปัดปิดแอปก็ยังรับแจ้งเตือนตามนัดหมายได้น้า~',
+      });
+      onShowToast(
+        'เปิดรับการแจ้งเตือนบนมือถือแล้วค่ะ',
+        'บันทึก Subscription สำเร็จ พร้อมแจ้งเตือนเมื่อถึงเวลานัดนะคะน้า~',
+      );
+    } catch (err: unknown) {
+      setPushFeedback({
+        kind: 'error',
+        text:
+          err instanceof Error
+            ? err.message
+            : 'เกิดข้อผิดพลาดในการบันทึก Subscription ลง Supabase ค่ะ',
+      });
+    } finally {
+      setPushBusy(false);
+    }
+  };
+
+  const handleDisableMobilePush = async () => {
+    if (!userId) return;
+    setPushBusy(true);
+    setPushFeedback(null);
+    try {
+      const endpoint = await unsubscribeDeviceWebPush();
+      if (endpoint) {
+        await deletePushSubscriptionDb(userId, endpoint);
+      }
+      setPushStatus('unsubscribed');
+      setPushFeedback({ kind: 'info', text: 'ยกเลิกการรับแจ้งเตือน Push บนอุปกรณ์นี้แล้วค่ะ' });
+    } catch (err: unknown) {
+      setPushFeedback({
+        kind: 'error',
+        text: err instanceof Error ? err.message : 'ยกเลิกการแจ้งเตือนบนอุปกรณ์นี้ไม่สำเร็จค่ะ',
+      });
+    } finally {
+      setPushBusy(false);
+    }
+  };
+
+  const handleInstallPwa = async () => {
+    if (!installPrompt) return;
+    await installPrompt.prompt();
+    await installPrompt.userChoice;
+    setInstallPrompt(null);
+  };
+
   const handleTestNotification = async () => {
     if (settings.soundEnabled) {
       playGentleBell();
@@ -84,7 +243,7 @@ export function SettingsModal({
       setPermission(perm);
     }
     if (perm === 'granted') {
-      sendBrowserNotification(
+      void sendBrowserNotification(
         'กริ๊ง! ทดสอบแจ้งเตือนจากน้อนอากิ้ค่ะ',
         'ระบบเสียงกระดิ่งและการแจ้งเตือนพร้อมดูแลตารางของคุณแล้วน้า~',
       );
@@ -183,11 +342,130 @@ export function SettingsModal({
             </div>
           </div>
 
+          {/* Mobile Background Web Push Section */}
+          <div className="space-y-3">
+            <h3 className="text-xs font-semibold text-[#7A6356]">
+              แจ้งเตือนบนมือถือ (แม้ปัดปิดแอป)
+            </h3>
+
+            <div className="p-3.5 bg-[#FAF7F2] border border-[#DFD1C2] rounded-xl space-y-3 shadow-xs shadow-[#5C4033]/5">
+              <div className="flex items-start gap-2.5">
+                <div
+                  className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 border ${
+                    pushStatus === 'subscribed'
+                      ? 'bg-[#EEF5EB] border-[#CFE0C9] text-[#4A7842]'
+                      : 'bg-white border-[#DFD1C2] text-[#5C4033]'
+                  }`}
+                >
+                  {pushStatus === 'subscribed' ? (
+                    <CheckCircle2 className="w-4 h-4" />
+                  ) : (
+                    <Smartphone className="w-4 h-4" />
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-[#2F2019]">
+                    {pushStatus === 'checking'
+                      ? 'กำลังตรวจสอบสถานะอุปกรณ์...'
+                      : pushStatus === 'subscribed'
+                        ? 'อุปกรณ์นี้เปิดรับแจ้งเตือนบนมือถือแล้วค่ะ'
+                        : pushStatus === 'unsupported'
+                          ? 'อุปกรณ์/โหมดนี้ยังไม่รองรับ Web Push'
+                          : 'เชื่อมต่ออุปกรณ์นี้เพื่อรับแจ้งเตือนเมื่อถึงเวลานัด'}
+                  </p>
+                  <p className="text-xs text-[#7A6356] mt-0.5 leading-relaxed">
+                    ระบบจะเช็กตารางเวลาทุก 1 นาที และส่ง Push ผ่าน Service Worker (/sw.js)
+                    แม้ปัดปิดแอปแล้ว
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  disabled={pushBusy}
+                  onClick={() => void handleEnableMobilePush()}
+                  className="flex-1 min-h-[42px] inline-flex items-center justify-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-gradient-to-r from-[#7A543E] to-[#5C4033] hover:from-[#6A4834] hover:to-[#4A3228] disabled:opacity-60 rounded-lg shadow-sm shadow-[#5C4033]/20 transition-all cursor-pointer"
+                >
+                  {pushBusy ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Smartphone className="w-4 h-4" />
+                  )}
+                  <span>
+                    {pushStatus === 'subscribed'
+                      ? 'อัปเดตสิทธิ์รับแจ้งเตือนบนมือถือ'
+                      : 'เปิดรับการแจ้งเตือนบนมือถือ'}
+                  </span>
+                </button>
+
+                {pushStatus === 'subscribed' && (
+                  <button
+                    type="button"
+                    disabled={pushBusy}
+                    onClick={() => void handleDisableMobilePush()}
+                    className="min-h-[42px] inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-[#7A6356] bg-white hover:bg-[#F5ECE3] border border-[#DFD1C2] rounded-lg transition-colors cursor-pointer"
+                  >
+                    <BellOff className="w-3.5 h-3.5" />
+                    <span>ปิดอุปกรณ์นี้</span>
+                  </button>
+                )}
+              </div>
+
+              {(installPrompt || isIosSafariWithoutStandalone()) && (
+                <div className="pt-2.5 border-t border-[#EAE0D5] flex flex-wrap items-center justify-between gap-2">
+                  <span className="text-[11px] text-[#7A6356]">
+                    แนะนำให้ติดตั้งเป็นแอปบนหน้าจอหลักเพื่อความเสถียรค่ะ
+                  </span>
+                  {installPrompt ? (
+                    <button
+                      type="button"
+                      onClick={() => void handleInstallPwa()}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#5C4033] bg-white hover:bg-[#F5ECE3] border border-[#DFD1C2] rounded-lg cursor-pointer"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>ติดตั้งลงหน้าจอหลัก</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setShowIosGuide((v) => !v)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#5C4033] bg-white hover:bg-[#F5ECE3] border border-[#DFD1C2] rounded-lg cursor-pointer"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>วิธีติดตั้งบน iPhone / iPad</span>
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {showIosGuide && (
+                <p className="text-xs text-[#5C4033] bg-white border border-[#DFD1C2] rounded-lg p-2.5 leading-relaxed">
+                  1. กดปุ่ม <strong>แชร์ (Share)</strong> ด้านล่างของ Safari <br />
+                  2. เลือก <strong>เพิ่มไปยังหน้าจอโฮม (Add to Home Screen)</strong> <br />
+                  3. เปิดแอปจากไอคอนหน้าจอหลัก แล้วค่อยกด &ldquo;เปิดรับการแจ้งเตือนบนมือถือ&rdquo; นะคะ
+                </p>
+              )}
+
+              {pushFeedback && (
+                <p
+                  className={`text-xs px-3 py-2 rounded-lg leading-relaxed border ${
+                    pushFeedback.kind === 'error'
+                      ? 'bg-[#FDF2EB] border-[#F1D5C2] text-[#B85627]'
+                      : 'bg-[#EEF5EB] border-[#CFE0C9] text-[#4A7842]'
+                  }`}
+                >
+                  {pushFeedback.text}
+                </p>
+              )}
+            </div>
+          </div>
+
           {/* Notification Settings */}
           <div className="space-y-3">
             <h3 className="text-xs font-semibold text-[#7A6356]">การแจ้งเตือนตารางกิจกรรม</h3>
 
-            <div className="p-3.5 bg-[#FAF7F2] border border-[#EAE0D5] rounded-xl space-y-3">
+            <div className="p-3.5 bg-[#FAF7F2] border border-[#DFD1C2] rounded-xl space-y-3">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-start gap-2.5 min-w-0">
                   <Bell className="w-4 h-4 text-[#5C4033] mt-0.5 shrink-0" />

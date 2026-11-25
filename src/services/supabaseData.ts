@@ -353,3 +353,55 @@ export async function clearAllUserDataDb(userId: string): Promise<void> {
   if (schDel.error) throw new Error(`ล้างตารางเวลาไม่สำเร็จ: ${schDel.error.message}`);
   if (noteDel.error) throw new Error(`ล้างโน้ตไม่สำเร็จ: ${noteDel.error.message}`);
 }
+
+export async function savePushSubscriptionDb(
+  userId: string,
+  sub: { endpoint: string; p256dh: string; auth: string; userAgent?: string },
+): Promise<void> {
+  const { error } = await supabase.from('push_subscriptions').upsert(
+    {
+      user_id: userId,
+      endpoint: sub.endpoint,
+      p256dh: sub.p256dh,
+      auth: sub.auth,
+      user_agent: sub.userAgent || '',
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: 'user_id,endpoint' },
+  );
+
+  if (error) {
+    throw new Error(`บันทึกข้อมูล Push Subscription ลงฐานข้อมูลไม่สำเร็จ: ${error.message}`);
+  }
+}
+
+export async function deletePushSubscriptionDb(
+  userId: string,
+  endpoint: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from('push_subscriptions')
+    .delete()
+    .eq('user_id', userId)
+    .eq('endpoint', endpoint);
+
+  if (error) {
+    throw new Error(`ยกเลิก Push Subscription ไม่สำเร็จ: ${error.message}`);
+  }
+}
+
+export async function hasPushSubscriptionDb(
+  userId: string,
+  endpoint: string,
+): Promise<boolean> {
+  const { data, error } = await supabase
+    .from('push_subscriptions')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('endpoint', endpoint)
+    .maybeSingle();
+
+  if (error) return false;
+  return Boolean(data?.id);
+}
+

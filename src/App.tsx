@@ -57,7 +57,11 @@ import {
   getLocalTimeString,
   getThaiDayOfWeek,
 } from './utils/dateFormat';
-import { playGentleBell, sendBrowserNotification } from './utils/notifications';
+import {
+  playGentleBell,
+  registerServiceWorker,
+  sendBrowserNotification,
+} from './utils/notifications';
 import { sanitizeImageSrc, sanitizeSingleLine, sanitizeText } from './utils/sanitize';
 
 const SETTINGS_KEY_PREFIX = 'nong_aki_settings_v1_';
@@ -134,6 +138,11 @@ export default function App() {
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
     }, 6500);
+  }, []);
+
+  // Register Service Worker (/sw.js) for Web Push notifications
+  useEffect(() => {
+    void registerServiceWorker();
   }, []);
 
   // Listen to Supabase Auth session
@@ -252,7 +261,7 @@ export default function App() {
             if (currentSettings.soundEnabled) {
               playGentleBell();
             }
-            sendBrowserNotification(title, body);
+            void sendBrowserNotification(title, body);
             showToast(title, body);
           }
           try {
@@ -296,7 +305,7 @@ export default function App() {
             playGentleBell();
           }
           if (currentSettings.notificationsEnabled) {
-            sendBrowserNotification(title, body);
+            void sendBrowserNotification(title, body);
           }
           showToast(title, body);
         }
@@ -981,6 +990,7 @@ export default function App() {
       {/* Settings, Account & Notifications Modal */}
       <SettingsModal
         open={settingsOpen}
+        userId={userId ?? undefined}
         userEmail={userEmail}
         settings={settings}
         onClose={() => setSettingsOpen(false)}
