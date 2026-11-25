@@ -668,7 +668,7 @@ export default function App() {
 
   if (authLoading) {
     return (
-      <div className="min-h-dvh bg-[#FAF7F2] text-[#5C4033] flex flex-col items-center justify-center gap-3 p-6">
+      <div className="h-[100dvh] bg-[#FAF7F2] text-[#5C4033] flex flex-col items-center justify-center gap-3 p-6">
         <Coffee className="w-8 h-8" />
         <div className="flex items-center gap-2 text-sm text-[#7A6356]">
           <Loader2 className="w-4 h-4 animate-spin text-[#5C4033]" />
@@ -737,7 +737,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-dvh lg:h-dvh flex flex-col bg-[#FAF7F2] text-[#2F2019] lg:overflow-hidden">
+    <div className="h-[100dvh] flex flex-col bg-[#FAF7F2] text-[#2F2019] overflow-hidden">
       {/* Top Application Header */}
       <header className="h-[52px] lg:h-[56px] bg-white border-b border-[#EAE0D5] px-4 lg:px-6 flex items-center justify-between gap-4 shrink-0 sticky top-0 z-30">
         <div className="flex items-center gap-2 shrink-0">
@@ -853,9 +853,9 @@ export default function App() {
       </main>
 
       {/* Mobile Single-Tab View (< lg) */}
-      <main className="lg:hidden flex-1 flex flex-col min-h-0 pb-[64px]">
+      <main className="lg:hidden flex-1 flex flex-col min-h-0 overflow-hidden">
         {mobileTab === 'chat' ? (
-          <div className="h-[calc(100dvh-52px-64px)] overflow-hidden">
+          <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
             <ChatPanel
               messages={messages}
               transactions={transactions}
@@ -877,14 +877,16 @@ export default function App() {
             />
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto p-4">{renderDashboardContent(mobileTab)}</div>
+          <div className="flex-1 min-h-0 overflow-y-auto p-4 pb-6">
+            {renderDashboardContent(mobileTab)}
+          </div>
         )}
       </main>
 
       {/* Mobile Bottom Navigation Bar (4 Buttons) */}
       <nav
         aria-label="เมนูนำทางหลัก"
-        className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#EAE0D5] pb-safe"
+        className="lg:hidden shrink-0 z-20 bg-white/95 backdrop-blur-md border-t border-[#EAE0D5] pb-safe"
       >
         <div className="grid grid-cols-4 h-[60px]">
           {(

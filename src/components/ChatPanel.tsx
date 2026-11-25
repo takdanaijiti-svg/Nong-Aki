@@ -160,7 +160,7 @@ export function ChatPanel({
   return (
     <section
       aria-label="หน้าต่างแชทกับน้อนอากิ้"
-      className="flex flex-col h-full bg-[#FAF7F2] lg:border-r border-[#EAE0D5] overflow-hidden"
+      className="flex flex-col h-full min-h-0 bg-[#FAF7F2] lg:border-r border-[#EAE0D5] overflow-hidden"
     >
       {/* Chat Panel Subheader */}
       <div className="px-4 py-3 border-b border-[#EAE0D5] flex items-center justify-between gap-3 shrink-0 bg-white">
@@ -190,7 +190,7 @@ export function ChatPanel({
       </div>
 
       {/* Scrollable Chat History */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 bg-[#FAF7F2]">
+      <div className="flex-1 min-h-0 overflow-y-auto px-4 py-4 space-y-4 bg-[#FAF7F2]">
         {messages.map((msg) => {
           const isUser = msg.role === 'user';
           const safePreview = sanitizeImageSrc(msg.imagePreview);
@@ -432,7 +432,7 @@ export function ChatPanel({
       </div>
 
       {/* Quick Prompts Bar (Mobile-First One-Handed Shortcuts) */}
-      <div className="px-3 py-2 bg-white border-t border-[#EAE0D5] flex items-center gap-2 overflow-x-auto shrink-0">
+      <div className="relative z-20 px-3 py-2 bg-white border-t border-[#EAE0D5] flex items-center gap-2 overflow-x-auto shrink-0">
         {QUICK_PROMPTS.map((item) => (
           <button
             key={item.label}
@@ -447,7 +447,7 @@ export function ChatPanel({
       </div>
 
       {/* Bottom Composer */}
-      <div className="relative p-3 bg-white border-t border-[#EAE0D5] shrink-0">
+      <div className="relative z-30 p-3 bg-white border-t border-[#EAE0D5] shrink-0">
         {attachedImage && (
           <div className="mb-2.5 flex items-center justify-between gap-2 p-2 bg-[#FAF7F2] border border-[#EAE0D5] rounded-xl">
             <div className="flex items-center gap-2.5 min-w-0">
@@ -504,8 +504,13 @@ export function ChatPanel({
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onKeyDown={handleKeyDown}
+            onFocus={() => {
+              setTimeout(() => {
+                listEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+              }, 150);
+            }}
             placeholder="พิมพ์คุยกับน้อนอากิ้ได้เลยครับ..."
-            className="flex-1 min-h-[44px] max-h-28 px-3.5 py-2.5 text-sm bg-[#FAF7F2] border border-[#EAE0D5] rounded-xl text-[#2F2019] placeholder:text-[#9A8172] focus:outline-none focus:border-[#5C4033] focus:bg-white resize-none leading-snug"
+            className="flex-1 min-h-[44px] max-h-28 px-3.5 py-2.5 text-[16px] sm:text-sm bg-[#FAF7F2] border border-[#EAE0D5] rounded-xl text-[#2F2019] placeholder:text-[#9A8172] focus:outline-none focus:border-[#5C4033] focus:bg-white resize-none leading-snug touch-manipulation"
           />
 
           <button
