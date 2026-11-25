@@ -2,6 +2,7 @@ import { supabase } from '../lib/supabase';
 import {
   ExpenseCategory,
   NoteItem,
+  PaymentMethod,
   ScheduleItem,
   Transaction,
   TransactionCategory,
@@ -65,12 +66,15 @@ function mapTransactionRow(row: Record<string, unknown>): Transaction {
       : 'อื่นๆ';
   const { date, time } = parseTransactionDate(row.date);
 
+  const paymentMethod: PaymentMethod = row.payment_method === 'cash' ? 'cash' : 'bank';
+
   return {
     id: String(row.id),
     type: isIncome ? 'income' : 'expense',
     amount: Math.abs(Number(row.amount) || 0),
     title: sanitizeSingleLine(row.description, 120) || (isIncome ? 'รายรับ' : 'รายจ่าย'),
     category,
+    paymentMethod,
     date,
     time,
     source: 'chat',
@@ -119,7 +123,7 @@ export async function fetchAllUserData(userId: string): Promise<{
   const [txRes, schRes, noteRes] = await Promise.all([
     supabase
       .from('transactions')
-      .select('id, type, amount, category, description, date')
+      .select('id, type, amount, category, description, date, payment_method')
       .eq('user_id', userId)
       .order('date', { ascending: false }),
     supabase
@@ -155,6 +159,7 @@ export async function insertTransactionsDb(
     type: item.type,
     amount: Math.abs(Number(item.amount) || 0),
     category: item.category,
+    payment_method: item.paymentMethod === 'cash' ? 'cash' : 'bank',
     description: sanitizeSingleLine(item.title, 120) || 'รายการ',
     date: item.date,
   }));
@@ -162,7 +167,7 @@ export async function insertTransactionsDb(
   const { data, error } = await supabase
     .from('transactions')
     .insert(rows)
-    .select('id, type, amount, category, description, date');
+    .select('id, type, amount, category, description, date, payment_method');
 
   if (error) throw new Error(`บันทึกรายการการเงินไม่สำเร็จ: ${error.message}`);
   return (data ?? []).map((r, idx) => ({
@@ -183,12 +188,13 @@ export async function updateTransactionDb(
       type: data.type,
       amount: Math.abs(Number(data.amount) || 0),
       category: data.category,
+      payment_method: data.paymentMethod === 'cash' ? 'cash' : 'bank',
       description: sanitizeSingleLine(data.title, 120) || 'รายการ',
       date: data.date,
     })
     .eq('id', id)
     .eq('user_id', userId)
-    .select('id, type, amount, category, description, date')
+    .select('id, type, amount, category, description, date, payment_method')
     .single();
 
   if (error) throw new Error(`แก้ไขรายการการเงินไม่สำเร็จ: ${error.message}`);
@@ -196,6 +202,20 @@ export async function updateTransactionDb(
     ...mapTransactionRow(updated as Record<string, unknown>),
     time: data.time,
   };
+}
+
+export async function updateTransactionPaymentMethodDb(
+  userId: string,
+  id: string,
+  paymentMethod: PaymentMethod,
+): Promise<void> {
+  const { error } = await supabase
+    .from('transactions')
+    .update({ payment_method: paymentMethod === 'cash' ? 'cash' : 'bank' })
+    .eq('id', id)
+    .eq('user_id', userId);
+
+  if (error) throw new Error(`สลับกระเป๋าเงินไม่สำเร็จ: ${error.message}`);
 }
 
 export async function deleteTransactionDb(userId: string, id: string): Promise<void> {

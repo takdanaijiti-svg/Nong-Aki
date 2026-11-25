@@ -33,6 +33,7 @@ import {
   updateNoteDb,
   updateScheduleDb,
   updateTransactionDb,
+  updateTransactionPaymentMethodDb,
 } from './services/supabaseData';
 import {
   AnalyzedResponse,
@@ -44,6 +45,7 @@ import {
   EditTarget,
   MobileTab,
   NoteItem,
+  PaymentMethod,
   ScheduleItem,
   ToastAlert,
   Transaction,
@@ -378,6 +380,11 @@ export default function App() {
             amount: Math.abs(Number(t.amount)),
             title: sanitizeSingleLine(t.title, 120) || 'รายการ',
             category: t.category,
+            paymentMethod: payload.imageBase64
+              ? 'bank'
+              : t.payment_method === 'cash'
+                ? 'cash'
+                : 'bank',
             date: t.date,
             time: t.time,
             source: sourceKind,
@@ -491,6 +498,29 @@ export default function App() {
     } catch (err: unknown) {
       showToast(
         'บันทึกรายการไม่สำเร็จ',
+        err instanceof Error ? sanitizeText(err.message, 250) : 'ลองใหม่อีกครั้งนะคะ',
+      );
+    }
+  };
+
+  const handleToggleTransactionPaymentMethod = async (tx: Transaction) => {
+    if (!userId) return;
+    const nextMethod: PaymentMethod = tx.paymentMethod === 'cash' ? 'bank' : 'cash';
+    setTransactions((prev) =>
+      prev.map((item) =>
+        item.id === tx.id ? { ...item, paymentMethod: nextMethod } : item,
+      ),
+    );
+    try {
+      await updateTransactionPaymentMethodDb(userId, tx.id, nextMethod);
+    } catch (err: unknown) {
+      setTransactions((prev) =>
+        prev.map((item) =>
+          item.id === tx.id ? { ...item, paymentMethod: tx.paymentMethod } : item,
+        ),
+      );
+      showToast(
+        'สลับกระเป๋าเงินไม่สำเร็จ',
         err instanceof Error ? sanitizeText(err.message, 250) : 'ลองใหม่อีกครั้งนะคะ',
       );
     }
@@ -712,6 +742,7 @@ export default function App() {
           onAdd={() => setEditTarget({ kind: 'transaction', mode: 'create' })}
           onEdit={(item) => setEditTarget({ kind: 'transaction', mode: 'edit', item })}
           onDelete={(id) => void handleDeleteTransaction(id)}
+          onTogglePaymentMethod={(item) => void handleToggleTransactionPaymentMethod(item)}
         />
       );
     }

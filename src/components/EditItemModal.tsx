@@ -1,9 +1,10 @@
 import { FormEvent, useEffect, useState } from 'react';
-import { X } from 'lucide-react';
+import { Banknote, Landmark, X } from 'lucide-react';
 import {
   EditTarget,
   ExpenseCategory,
   NoteItem,
+  PaymentMethod,
   ScheduleItem,
   Transaction,
   TransactionType,
@@ -32,6 +33,7 @@ export function EditItemModal({
   const [txTitle, setTxTitle] = useState('');
   const [txAmount, setTxAmount] = useState('');
   const [txCategory, setTxCategory] = useState<ExpenseCategory>('อาหาร');
+  const [txPaymentMethod, setTxPaymentMethod] = useState<PaymentMethod>('bank');
   const [txDate, setTxDate] = useState(getLocalDateString(0));
   const [txTime, setTxTime] = useState(getLocalTimeString());
 
@@ -60,6 +62,7 @@ export function EditItemModal({
           ? (item.category as ExpenseCategory)
           : 'อาหาร',
       );
+      setTxPaymentMethod(item?.paymentMethod ?? 'bank');
       setTxDate(item?.date ?? getLocalDateString(0));
       setTxTime(item?.time ?? getLocalTimeString());
     } else if (target.kind === 'schedule') {
@@ -108,6 +111,7 @@ export function EditItemModal({
           title: cleanTitle,
           amount: numAmount,
           category: txType === 'income' ? 'รายรับ' : txCategory,
+          paymentMethod: txPaymentMethod,
           date: txDate || getLocalDateString(0),
           time: txTime || getLocalTimeString(),
         },
@@ -272,6 +276,38 @@ export function EditItemModal({
                     </select>
                   </div>
                 )}
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-[#7A6356] mb-1">
+                  กระเป๋าเงิน
+                </label>
+                <div className="grid grid-cols-2 gap-1 p-1 bg-[#FAF7F2] border border-[#EAE0D5] rounded-lg">
+                  <button
+                    type="button"
+                    onClick={() => setTxPaymentMethod('bank')}
+                    className={`py-2 px-2 text-xs font-medium rounded-md transition-colors flex items-center justify-center gap-1.5 cursor-pointer ${
+                      txPaymentMethod === 'bank'
+                        ? 'bg-[#5C4033] text-white shadow-xs'
+                        : 'text-[#7A6356] hover:text-[#2F2019]'
+                    }`}
+                  >
+                    <Landmark className="w-3.5 h-3.5" />
+                    <span>เงินธนาคาร / โอน</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTxPaymentMethod('cash')}
+                    className={`py-2 px-2 text-xs font-medium rounded-md transition-colors flex items-center justify-center gap-1.5 cursor-pointer ${
+                      txPaymentMethod === 'cash'
+                        ? 'bg-[#5C4033] text-white shadow-xs'
+                        : 'text-[#7A6356] hover:text-[#2F2019]'
+                    }`}
+                  >
+                    <Banknote className="w-3.5 h-3.5" />
+                    <span>เงินสด</span>
+                  </button>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">

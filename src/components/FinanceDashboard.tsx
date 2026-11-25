@@ -2,8 +2,10 @@ import { useMemo, useState } from 'react';
 import {
   ArrowDownLeft,
   ArrowUpRight,
+  Banknote,
   BarChart3,
   Car,
+  Landmark,
   Package,
   Pencil,
   PieChart,
@@ -13,7 +15,7 @@ import {
   Utensils,
   Wallet,
 } from 'lucide-react';
-import { ExpenseCategory, Transaction } from '../types';
+import { ExpenseCategory, PaymentMethod, Transaction } from '../types';
 import { formatCurrency, formatThaiDate, getLocalDateString } from '../utils/dateFormat';
 
 interface FinanceDashboardProps {
@@ -21,10 +23,12 @@ interface FinanceDashboardProps {
   onAdd: () => void;
   onEdit: (item: Transaction) => void;
   onDelete: (id: string) => void;
+  onTogglePaymentMethod: (item: Transaction) => void;
 }
 
 type PeriodFilter = 'today' | 'month' | 'all';
 type TypeFilter = 'all' | 'expense' | 'income';
+type WalletFilter = 'all' | PaymentMethod;
 type ChartMode = 'donut' | 'bar';
 
 const CATEGORY_META: Record<
@@ -44,9 +48,11 @@ export function FinanceDashboard({
   onAdd,
   onEdit,
   onDelete,
+  onTogglePaymentMethod,
 }: FinanceDashboardProps) {
   const [period, setPeriod] = useState<PeriodFilter>('month');
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
+  const [walletFilter, setWalletFilter] = useState<WalletFilter>('all');
   const [chartMode, setChartMode] = useState<ChartMode>('donut');
 
   const today = getLocalDateString(0);
@@ -78,6 +84,33 @@ export function FinanceDashboard({
     };
   }, [transactions, today, currentMonth]);
 
+  const walletSummary = useMemo(() => {
+    let bankIncome = 0;
+    let bankExpense = 0;
+    let cashIncome = 0;
+    let cashExpense = 0;
+
+    for (const tx of transactions) {
+      const isCash = tx.paymentMethod === 'cash';
+      if (tx.type === 'income') {
+        if (isCash) cashIncome += tx.amount;
+        else bankIncome += tx.amount;
+      } else {
+        if (isCash) cashExpense += tx.amount;
+        else bankExpense += tx.amount;
+      }
+    }
+
+    return {
+      bankIncome,
+      bankExpense,
+      bankBalance: bankIncome - bankExpense,
+      cashIncome,
+      cashExpense,
+      cashBalance: cashIncome - cashExpense,
+    };
+  }, [transactions]);
+
   const periodFiltered = useMemo(() => {
     return transactions.filter((tx) => {
       if (period === 'today') return tx.date === today;
@@ -89,9 +122,10 @@ export function FinanceDashboard({
   const visibleTransactions = useMemo(() => {
     return periodFiltered
       .filter((tx) => (typeFilter === 'all' ? true : tx.type === typeFilter))
+      .filter((tx) => (walletFilter === 'all' ? true : tx.paymentMethod === walletFilter))
       .slice()
       .sort((a, b) => `${b.date} ${b.time}`.localeCompare(`${a.date} ${a.time}`));
-  }, [periodFiltered, typeFilter]);
+  }, [periodFiltered, typeFilter, walletFilter]);
 
   const categoryBreakdown = useMemo(() => {
     const totals: Record<ExpenseCategory, number> = {
@@ -199,6 +233,47 @@ export function FinanceDashboard({
             {summary.monthNet < 0 ? '-' : ''}฿{formatCurrency(Math.abs(summary.monthNet))}
           </p>
           <p className="mt-1 text-xs text-[#EADBC8]">รายรับหักรายจ่าย</p>
+        </div>
+      </div>
+
+      {/* Separated Cash & Bank Wallets */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="bg-white border border-[#EAE0D5] rounded-xl p-4 flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-[#F5ECE3] text-[#5C4033] flex items-center justify-center shrink-0">
+                <Landmark className="w-4 h-4" />
+              </div>
+              <p className="text-xs font-semibold text-[#5C4033]">เงินธนาคาร / โอน</p>
+            </div>
+            <p className="mt-2 text-lg sm:text-xl font-semibold text-[#2F2019] font-mono tabular-nums">
+              {walletSummary.bankBalance < 0 ? '-' : ''}฿
+              {formatCurrency(Math.abs(walletSummary.bankBalance))}
+            </p>
+            <p className="mt-0.5 text-[11px] text-[#7A6356] font-mono tabular-nums">
+              รับ +฿{formatCurrency(walletSummary.bankIncome)} · จ่าย -฿
+              {formatCurrency(walletSummary.bankExpense)}
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-white border border-[#EAE0D5] rounded-xl p-4 flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-amber-50 border border-amber-200/70 text-amber-800 flex items-center justify-center shrink-0">
+                <Banknote className="w-4 h-4" />
+              </div>
+              <p className="text-xs font-semibold text-[#5C4033]">เงินสด</p>
+            </div>
+            <p className="mt-2 text-lg sm:text-xl font-semibold text-[#2F2019] font-mono tabular-nums">
+              {walletSummary.cashBalance < 0 ? '-' : ''}฿
+              {formatCurrency(Math.abs(walletSummary.cashBalance))}
+            </p>
+            <p className="mt-0.5 text-[11px] text-[#7A6356] font-mono tabular-nums">
+              รับ +฿{formatCurrency(walletSummary.cashIncome)} · จ่าย -฿
+              {formatCurrency(walletSummary.cashExpense)}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -385,7 +460,7 @@ export function FinanceDashboard({
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <div className="flex items-center gap-1 p-1 bg-[#FAF7F2] border border-[#EAE0D5] rounded-lg">
               {(
                 [
@@ -405,6 +480,29 @@ export function FinanceDashboard({
                   }`}
                 >
                   {t.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-1 p-1 bg-[#FAF7F2] border border-[#EAE0D5] rounded-lg">
+              {(
+                [
+                  { id: 'all', label: 'ทุกกระเป๋า' },
+                  { id: 'bank', label: 'เงินโอน' },
+                  { id: 'cash', label: 'เงินสด' },
+                ] as const
+              ).map((w) => (
+                <button
+                  key={w.id}
+                  type="button"
+                  onClick={() => setWalletFilter(w.id)}
+                  className={`px-2.5 py-1 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    walletFilter === w.id
+                      ? 'bg-[#C8A27C] text-white shadow-xs'
+                      : 'text-[#7A6356] hover:text-[#2F2019]'
+                  }`}
+                >
+                  {w.label}
                 </button>
               ))}
             </div>
@@ -451,27 +549,47 @@ export function FinanceDashboard({
                     >
                       <CatIcon className="w-4 h-4" />
                     </div>
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium text-[#2F2019] truncate">{tx.title}</p>
-                      <p className="text-xs text-[#7A6356] truncate">
-                        {tx.category}
-                        <span className="mx-1.5" aria-hidden="true">
-                          ·
-                        </span>
-                        {formatThaiDate(tx.date)}
-                        <span className="mx-1.5" aria-hidden="true">
-                          ·
-                        </span>
+                      <div className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-[#7A6356]">
+                        <span>{tx.category}</span>
+                        <span aria-hidden="true">·</span>
+                        <span>{formatThaiDate(tx.date)}</span>
+                        <span aria-hidden="true">·</span>
                         <span className="font-mono tabular-nums">{tx.time}</span>
                         {tx.source === 'slip' && (
                           <>
-                            <span className="mx-1.5" aria-hidden="true">
-                              ·
-                            </span>
+                            <span aria-hidden="true">·</span>
                             <span>จากสลิป</span>
                           </>
                         )}
-                      </p>
+                        <span aria-hidden="true">·</span>
+                        <button
+                          type="button"
+                          onClick={() => onTogglePaymentMethod(tx)}
+                          title="กดเพื่อสลับระหว่างเงินสดและเงินธนาคาร"
+                          aria-label={`สลับกระเป๋าเงินของ ${tx.title} (ปัจจุบัน: ${
+                            tx.paymentMethod === 'cash' ? 'เงินสด' : 'เงินธนาคาร/โอน'
+                          })`}
+                          className={`inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium rounded-md border transition-colors whitespace-nowrap cursor-pointer ${
+                            tx.paymentMethod === 'cash'
+                              ? 'bg-amber-50 border-amber-200/80 text-amber-800 hover:bg-amber-100'
+                              : 'bg-[#FAF7F2] border-[#EAE0D5] text-[#5C4033] hover:bg-[#F5ECE3]'
+                          }`}
+                        >
+                          {tx.paymentMethod === 'cash' ? (
+                            <>
+                              <Banknote className="w-3 h-3" />
+                              <span>เงินสด</span>
+                            </>
+                          ) : (
+                            <>
+                              <Landmark className="w-3 h-3" />
+                              <span>เงินโอน</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </div>
 

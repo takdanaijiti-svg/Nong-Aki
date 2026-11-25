@@ -1,13 +1,14 @@
 import { ChangeEvent, FormEvent, KeyboardEvent, useEffect, useRef, useState } from 'react';
 import {
+  Banknote,
   CalendarClock,
   ImagePlus,
+  Landmark,
   Loader2,
   Pencil,
   SendHorizontal,
   StickyNote,
   Trash2,
-  Wallet,
   X,
 } from 'lucide-react';
 import {
@@ -241,11 +242,17 @@ export function ChatPanel({
                                   : 'bg-[#FAF7F2] border border-[#EAE0D5] text-[#5C4033]'
                               }`}
                             >
-                              <Wallet className="w-4 h-4" />
+                              {tx.paymentMethod === 'cash' ? (
+                                <Banknote className="w-4 h-4" />
+                              ) : (
+                                <Landmark className="w-4 h-4" />
+                              )}
                             </div>
                             <div className="min-w-0">
-                              <p className="text-xs text-[#7A6356]">
-                                การเงิน · {tx.category} · {formatThaiDate(tx.date)}
+                              <p className="text-xs text-[#7A6356] truncate">
+                                การเงิน · {tx.category} ·{' '}
+                                {tx.paymentMethod === 'cash' ? 'เงินสด' : 'เงินโอน'} ·{' '}
+                                {formatThaiDate(tx.date)}
                               </p>
                               <p className="text-sm font-medium text-[#2F2019] truncate group-hover:text-[#5C4033]">
                                 {tx.title}{' '}

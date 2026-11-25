@@ -61,6 +61,11 @@ const analyzeSchema = {
             description:
               'สำหรับ expense ต้องเลือก 1 ค่าจาก: "อาหาร", "เดินทาง", "ของใช้", "อื่นๆ" และสำหรับ income ใช้ "รายรับ"',
           },
+          payment_method: {
+            type: Type.STRING,
+            description:
+              'ช่องทางการเงิน ต้องเป็น "cash" (เงินสด) หรือ "bank" (เงินธนาคาร/โอน/สแกนจ่าย/สลิป) เท่านั้น ค่าเริ่มต้นคือ "bank"',
+          },
           date: {
             type: Type.STRING,
             description: 'วันที่รูปแบบ YYYY-MM-DD (ค.ศ.)',
@@ -70,7 +75,7 @@ const analyzeSchema = {
             description: 'เวลารูปแบบ HH:mm (24 ชั่วโมง)',
           },
         },
-        required: ['type', 'amount', 'title', 'category', 'date', 'time'],
+        required: ['type', 'amount', 'title', 'category', 'payment_method', 'date', 'time'],
       },
     },
     schedules: {
@@ -212,7 +217,8 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
       `   - ถ้ามีการจ่ายเงิน ซื้อของ กินข้าว ค่ากาแฟ ค่าเดินทาง หรือเห็นสลิปโอนเงินออก ให้บันทึกเป็น type: "expense"`,
       `   - ถ้าได้รับเงิน เงินเดือนเข้า โอนเข้า ขายของได้ ให้บันทึกเป็น type: "income" และ category: "รายรับ"`,
       `   - category ของ expense ต้องเป็นหนึ่งใน 4 ค่านี้เท่านั้น: "อาหาร", "เดินทาง", "ของใช้", "อื่นๆ"`,
-      `   - หากอ่านสลิปโอนเงิน: ดึงยอดเงิน (amount) ชื่อร้านค้า/ผู้รับโอน (title) และวันเวลาในสลิป (หากเป็น พ.ศ. เช่น 2569 ให้ลบ 543 เป็น ค.ศ. 2026)`,
+      `   - payment_method: หากผู้ใช้ระบุว่า "เงินสด", "จ่ายสด", "ใช้เงินสด", หรือ "สด" ให้ตั้งเป็น "cash" ส่วนกรณีสลิปโอนเงิน สแกนจ่าย โอนเข้าบัญชี หรือไม่ได้ระบุ ให้ตั้งเป็น "bank"`,
+      `   - หากอ่านสลิปโอนเงิน: ดึงยอดเงิน (amount) ชื่อร้านค้า/ผู้รับโอน (title) วันเวลาในสลิป (หากเป็น พ.ศ. เช่น 2569 ให้ลบ 543 เป็น ค.ศ. 2026) และตั้ง payment_method เป็น "bank"`,
       `2. schedules (ตารางเวลา):`,
       `   - นัดหมาย ประชุม ส่งงาน ไปหาหมอ หรือสิ่งที่ต้องทำที่มีวันหรือเวลา (เช่น "พรุ่งนี้ 10 โมงมีส่งงาน", "อีก 2 ชั่วโมงมีประชุม")`,
       `   - คำนวณวันที่และเวลาจริงอย่างแม่นยำเทียบกับวันเวลาปัจจุบันของระบบ (${safeDate} ${safeTime}):`,
@@ -259,45 +265,76 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
         : 'ผู้ใช้แนบรูปภาพสลิปโอนเงิน/ใบเสร็จมาให้ช่วยอ่านและบันทึกลงหมวดที่เหมาะสม',
     });
 
+    const hasAttachedImage = Boolean(imageBase64 && typeof imageBase64 === 'string');
+
+    const isFallbackableError = (err: unknown): boolean => {
+      const record = err && typeof err === 'object' ? (err as Record<string, unknown>) : {};
+      const status = Number(record.status ?? record.code ?? 0);
+      if (status === 503 || status === 429 || status === 404) return true;
+      const msg = (err instanceof Error ? err.message : String(err)).toLowerCase();
+      return (
+        msg.includes('503') ||
+        msg.includes('overloaded') ||
+        msg.includes('unavailable') ||
+        msg.includes('high demand') ||
+        msg.includes('service unavailable') ||
+        msg.includes('429') ||
+        msg.includes('resource_exhausted') ||
+        msg.includes('404') ||
+        msg.includes('not_found')
+      );
+    };
+
+    const waitMs = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
     let response;
     const attempts = [
       {
         model: 'gemini-2.5-flash',
         thinkingConfig: { thinkingBudget: 0 },
+        retriesOn503: 0, // Switch immediately to gemini-2.5-flash-lite on 503/Overloaded
+      },
+      {
+        model: 'gemini-2.5-flash-lite',
+        thinkingConfig: { thinkingBudget: 0 },
+        retriesOn503: 1,
       },
       {
         model: 'gemini-3.1-flash-lite',
         thinkingConfig: { thinkingLevel: ThinkingLevel.MINIMAL },
+        retriesOn503: 1,
       },
     ];
     let lastErr: unknown;
 
     for (const cfg of attempts) {
-      try {
-        response = await ai.models.generateContent({
-          model: cfg.model,
-          contents: { parts },
-          config: {
-            systemInstruction,
-            responseMimeType: 'application/json',
-            responseSchema: analyzeSchema,
-            thinkingConfig: cfg.thinkingConfig,
-          },
-        });
-        lastErr = undefined;
-        break;
-      } catch (apiErr: unknown) {
-        lastErr = apiErr;
-        const msg = apiErr instanceof Error ? apiErr.message : String(apiErr);
-        const shouldFallback =
-          msg.includes('404') ||
-          msg.includes('503') ||
-          msg.includes('UNAVAILABLE') ||
-          msg.includes('429');
-        if (!shouldFallback) {
-          throw apiErr;
+      let modelSucceeded = false;
+      for (let attempt = 0; attempt <= cfg.retriesOn503; attempt += 1) {
+        try {
+          response = await ai.models.generateContent({
+            model: cfg.model,
+            contents: { parts },
+            config: {
+              systemInstruction,
+              responseMimeType: 'application/json',
+              responseSchema: analyzeSchema,
+              thinkingConfig: cfg.thinkingConfig,
+            },
+          });
+          lastErr = undefined;
+          modelSucceeded = true;
+          break;
+        } catch (apiErr: unknown) {
+          lastErr = apiErr;
+          if (!isFallbackableError(apiErr)) {
+            throw apiErr;
+          }
+          if (attempt < cfg.retriesOn503) {
+            await waitMs(450);
+          }
         }
       }
+      if (modelSucceeded) break;
     }
 
     if (!response && lastErr) {
@@ -318,6 +355,11 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
             .map((t: Record<string, unknown>) => {
               const isIncome = t.type === 'income';
               const rawCat = sanitizeServerText(t.category, 40) || 'อื่นๆ';
+              const paymentMethod = hasAttachedImage
+                ? 'bank'
+                : t.payment_method === 'cash'
+                  ? 'cash'
+                  : 'bank';
               return {
                 type: isIncome ? 'income' : 'expense',
                 amount: Math.abs(Number(t.amount)),
@@ -329,6 +371,7 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
                   : allowedExpenseCategories.has(rawCat)
                     ? rawCat
                     : 'อื่นๆ',
+                payment_method: paymentMethod,
                 date:
                   typeof t.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(t.date)
                     ? t.date

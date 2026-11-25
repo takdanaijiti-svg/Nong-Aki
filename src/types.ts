@@ -1,6 +1,7 @@
 export type ExpenseCategory = 'อาหาร' | 'เดินทาง' | 'ของใช้' | 'อื่นๆ';
 export type TransactionCategory = ExpenseCategory | 'รายรับ';
 export type TransactionType = 'expense' | 'income';
+export type PaymentMethod = 'cash' | 'bank';
 
 export interface Transaction {
   id: string;
@@ -8,6 +9,7 @@ export interface Transaction {
   amount: number;
   title: string;
   category: TransactionCategory;
+  paymentMethod: PaymentMethod;
   date: string; // YYYY-MM-DD
   time: string; // HH:mm
   source: 'chat' | 'slip' | 'manual';
@@ -60,6 +62,7 @@ export interface AnalyzedResponse {
     amount: number;
     title: string;
     category: TransactionCategory;
+    payment_method?: PaymentMethod;
     date: string;
     time: string;
   }>;
