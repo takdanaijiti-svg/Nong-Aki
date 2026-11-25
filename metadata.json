@@ -1,0 +1,8 @@
+{
+  "name": "เพื่อนเกลอ — Personal AI Assistant",
+  "description": "ผู้ช่วยส่วนตัวสไตล์มินิมอล จัดการการเงิน ตารางเวลา และโน้ตผ่านแชทภาษาไทยและสลิปโอนเงินด้วย Gemini AI",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
