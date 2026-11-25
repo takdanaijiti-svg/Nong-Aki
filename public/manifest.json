@@ -1,0 +1,16 @@
+{
+  "name": "น้อนอากิ้ — ผู้ช่วยส่วนตัวสุดน่ารัก",
+  "short_name": "น้อนอากิ้",
+  "description": "ผู้ช่วยส่วนตัวสไตล์มินิมอลโทนคาเฟ่ จัดการการเงิน ตารางเวลา และโน้ตผ่านแชทภาษาไทยและสลิปโอนเงิน",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAF7F2",
+  "theme_color": "#5C4033",
+  "icons": [
+    {
+      "src": "/aki-logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

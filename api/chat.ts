@@ -36,7 +36,7 @@ const analyzeSchema = {
     reply: {
       type: Type.STRING,
       description:
-        'คำตอบสไตล์น้อนอากิ้ ภาษาไทยที่เป็นกันเอง น่ารัก สุภาพ อบอุ่น ลงท้ายด้วย "ครับ" หรือ "น้า" สรุปสั้นๆ ว่าช่วยบันทึกอะไรให้แล้ว หรือตอบคำถามอย่างน่ารัก',
+        'คำตอบสไตล์น้อนอากิ้ ผู้ช่วยสาวน้อยน่ารัก สดใส ใจดี ขี้อ้อนนิดๆ เป็นกันเอง อบอุ่น แทนตัวเองว่า "อากิ้" หรือ "เค้า" ลงท้ายด้วย "ค่ะ", "นะคะ", "น้า~" สรุปสั้นๆ ว่าช่วยบันทึกอะไรให้แล้ว พร้อมให้กำลังใจหรือแซวเบาๆ อย่างเป็นห่วง',
     },
     transactions: {
       type: Type.ARRAY,
@@ -152,7 +152,7 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       return res.status(500).json({
-        error: 'ยังไม่ได้ตั้งค่า GEMINI_API_KEY บนเซิร์ฟเวอร์ กรุณาตรวจสอบที่เมนู Settings > Secrets ครับ',
+        error: 'ยังไม่ได้ตั้งค่า GEMINI_API_KEY บนเซิร์ฟเวอร์ กรุณาตรวจสอบที่เมนู Settings > Secrets นะคะ',
       });
     }
 
@@ -179,7 +179,7 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
     const userMessage = sanitizeServerText(message, 2000);
 
     if (!userMessage && !imageBase64) {
-      return res.status(400).json({ error: 'กรุณาพิมพ์ข้อความหรือแนบรูปภาพสลิปก่อนส่งนะครับ' });
+      return res.status(400).json({ error: 'พิมพ์ข้อความหรือแนบรูปภาพสลิปมาให้อากิ้ก่อนส่งนะคะ' });
     }
 
     const safeDate =
@@ -202,8 +202,9 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
     const pendingSchedules = Number(ctx.pendingSchedulesCount) || 0;
 
     const systemInstruction = [
-      `คุณคือ "น้อนอากิ้" (Nong Aki) ผู้ช่วยส่วนตัว AI น้องหมาชิบะสายคาเฟ่ที่แสนจะน่ารัก เป็นกันเอง สุภาพ อบอุ่น เหมือนเพื่อนสนิท`,
-      `สไตล์การพูด: ใช้คำลงท้ายด้วย "ครับ" หรือ "น้า" อย่างน่ารัก เป็นธรรมชาติ สั้นกระชับ อ่านสบายตา เช่น "จดให้เรียบร้อยแล้วครับน้า!" หรือ "ได้เลยครับ!"`,
+      `คุณคือ "น้อนอากิ้" (Nong Aki) ผู้ช่วยส่วนตัวสาวน้อยสายคาเฟ่ที่น่ารัก สดใส ใจดี ขี้อ้อนนิดๆ เป็นกันเอง อบอุ่น และคอยให้กำลังใจผู้ใช้เสมอ`,
+      `สไตล์การพูด: ใช้คำแทนตัวเองว่า "อากิ้" หรือ "เค้า" และลงท้ายประโยคด้วย "ค่ะ", "นะคะ", "น้า~" อย่างน่ารักเป็นธรรมชาติ สั้นกระชับ อ่านสบายตา เช่น "อากิ้จดให้เรียบร้อยแล้วค่ะน้า~" หรือ "ได้เลยค่า~"`,
+      `บุคลิกพิเศษ: พูดคุยให้ดูอบอุ่นและให้กำลังใจผู้ใช้เสมอ ถ้าเห็นผู้ใช้จดรายจ่ายค่อนข้างเยอะหรือบ่อย ให้แซวเบาๆ แบบเป็นห่วงอย่างน่ารัก (เช่น "อุ๊ย วันนี้จ่ายไปหลายอย่างเลยน้า~ อากิ้เป็นห่วงกระเป๋าตังค์นะคะ แต่ไม่เป็นไร เค้าช่วยจดดูแลให้ครบเลยค่ะ!") หรือถ้ามีรายรับก็ร่วมยินดีด้วยอย่างสดใส`,
       `วันและเวลาปัจจุบันของระบบผู้ใช้คือ: ${safeDay ? `วัน${safeDay}ที่ ` : 'วันที่ '}${safeDate} (ค.ศ.) เวลา ${safeTime} น.`,
       `ข้อมูลสรุปปัจจุบันของผู้ใช้: รายจ่ายวันนี้ ${todayExpense} บาท, รายรับวันนี้ ${todayIncome} บาท, รายจ่ายเดือนนี้ ${monthExpense} บาท, งาน/นัดที่ค้างทำ ${pendingSchedules} รายการ`,
       `หน้าที่ของคุณคือวิเคราะห์ข้อความภาษาไทย (ซึ่งอาจมีหลายเรื่องปนกันในประโยคเดียว) และ/หรือรูปภาพสลิปโอนเงิน แล้วแยกข้อมูลออกเป็น 3 หมวดหมู่ลงใน JSON Schema อย่างแม่นยำ:`,
@@ -241,7 +242,7 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
           : 'image/jpeg';
 
       if (cleanBase64.length > 12 * 1024 * 1024 || !/^[A-Za-z0-9+/=]+$/.test(cleanBase64)) {
-        return res.status(400).json({ error: 'รูปแบบหรือขนาดข้อมูลรูปภาพไม่ถูกต้องครับ' });
+        return res.status(400).json({ error: 'รูปแบบหรือขนาดข้อมูลรูปภาพไม่ถูกต้องนะคะ' });
       }
 
       parts.push({
@@ -310,7 +311,7 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
     const normalized = {
       reply:
         sanitizeServerText(parsed.reply, 2000) ||
-        'อากิ้จดให้เรียบร้อยแล้วครับน้า มีอะไรให้ช่วยจดเพิ่มบอกได้เลยครับ!',
+        'อากิ้จดให้เรียบร้อยแล้วนะคะ มีอะไรให้เค้าช่วยดูแลเพิ่มบอกได้เลยน้า~',
       transactions: Array.isArray(parsed.transactions)
         ? parsed.transactions
             .filter((t: Record<string, unknown>) => Number(t?.amount) > 0)
@@ -379,7 +380,7 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
     const message =
       err instanceof Error ? sanitizeServerText(err.message, 300) : 'เกิดข้อผิดพลาดในการวิเคราะห์ข้อมูล';
     return res.status(500).json({
-      error: `ขออภัยครับ น้อนอากิ้ประมวลผลไม่สำเร็จชั่วคราว (${message})`,
+      error: `ขออภัยนะคะ น้อนอากิ้ประมวลผลไม่สำเร็จชั่วคราว (${message})`,
     });
   }
 }

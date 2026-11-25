@@ -100,7 +100,7 @@ export function NotesDashboard({ notes, onAdd, onEdit, onDelete }: NotesDashboar
       {filteredNotes.length === 0 ? (
         <div className="bg-white border border-[#EAE0D5] rounded-xl py-14 px-4 text-center">
           <StickyNote className="w-8 h-8 text-[#C8A27C] mx-auto mb-2.5" />
-          <p className="text-sm font-medium text-[#2F2019]">ไม่พบบันทึกช่วยจำที่ตรงกับการค้นหาครับ</p>
+          <p className="text-sm font-medium text-[#2F2019]">ไม่พบบันทึกช่วยจำที่ตรงกับการค้นหาค่ะ</p>
           <p className="text-xs text-[#7A6356] mt-1">
             ลองพิมพ์บอกน้อนอากิ้ในแชท เช่น &ldquo;อย่าลืมซื้อน้ำยาล้างจาน&rdquo; หรือเพิ่มโน้ตใหม่ด้านบนได้เลยน้า
           </p>

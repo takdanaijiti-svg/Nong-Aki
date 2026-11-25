@@ -95,11 +95,11 @@ export function EditItemModal({
       const cleanTitle = sanitizeSingleLine(txTitle, 120);
       const numAmount = Number(txAmount);
       if (!cleanTitle) {
-        setErrorMsg('กรุณาระบุชื่อรายการครับ');
+        setErrorMsg('กรุณาระบุชื่อรายการนะคะ');
         return;
       }
       if (!Number.isFinite(numAmount) || numAmount <= 0) {
-        setErrorMsg('กรุณาระบุจำนวนเงินที่มากกว่า 0 ครับ');
+        setErrorMsg('กรุณาระบุจำนวนเงินที่มากกว่า 0 นะคะ');
         return;
       }
       onSaveTransaction(
@@ -120,7 +120,7 @@ export function EditItemModal({
     if (target.kind === 'schedule') {
       const cleanTitle = sanitizeSingleLine(schTitle, 160);
       if (!cleanTitle) {
-        setErrorMsg('กรุณาระบุชื่อนัดหมายหรือสิ่งที่ต้องทำครับ');
+        setErrorMsg('กรุณาระบุชื่อนัดหมายหรือสิ่งที่ต้องทำนะคะ');
         return;
       }
       onSaveSchedule(
@@ -140,7 +140,7 @@ export function EditItemModal({
       const cleanTitle = sanitizeSingleLine(noteTitle, 120);
       const cleanContent = sanitizeText(noteContent, 1500);
       if (!cleanTitle && !cleanContent) {
-        setErrorMsg('กรุณากรอกหัวข้อหรือเนื้อหาโน้ตครับ');
+        setErrorMsg('กรุณากรอกหัวข้อหรือเนื้อหาโน้ตนะคะ');
         return;
       }
       const tags = noteTagsText

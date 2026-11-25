@@ -1,8 +1,6 @@
 import { AppSettings, ChatMessage } from '../types';
 import { getLocalTimeString } from '../utils/dateFormat';
 
-export const AKI_AVATAR_URL = '/src/assets/images/aki_cafe_avatar_1795597502721.jpg';
-
 export interface QuickPromptItem {
   label: string;
   mode: 'prefill' | 'send';
@@ -23,7 +21,7 @@ export const QUICK_PROMPTS: QuickPromptItem[] = [
   {
     label: 'สรุปยอดวันนี้',
     mode: 'send',
-    text: 'ช่วยสรุปยอดรายรับรายจ่ายวันนี้ให้หน่อยครับ',
+    text: 'ช่วยสรุปยอดรายรับรายจ่ายวันนี้ให้หน่อยน้า',
   },
 ];
 
@@ -40,7 +38,7 @@ export function createWelcomeMessage(text?: string): ChatMessage {
     role: 'assistant',
     text:
       text ??
-      'สวัสดีครับน้า! น้อนอากิ้พร้อมช่วยดูแลแล้วครับ จะพิมพ์บอกค่าข้าว นัดหมาย โน้ตช่วยจำ หรืออัปโหลดรูปสลิปโอนเงินมาก็ได้น้า เดี๋ยวอากิ้ช่วยแยกหมวดแล้วบันทึกเข้าบัญชีให้อัตโนมัติเลยครับ!',
+      'สวัสดีค่า~ น้อนอากิ้มาอยู่เป็นเพื่อนช่วยดูแลแล้วนะคะ! จะพิมพ์บอกค่าข้าว นัดหมาย โน้ตช่วยจำ หรือส่งรูปสลิปโอนเงินมาก็ได้น้า เดี๋ยวเค้าช่วยแยกหมวดแล้วเก็บเข้าบัญชีให้เรียบร้อยเลยค่ะ!',
     timestamp: getLocalTimeString(),
   };
 }

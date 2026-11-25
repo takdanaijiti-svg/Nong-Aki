@@ -3,7 +3,6 @@ import type { Session } from '@supabase/supabase-js';
 import {
   Bell,
   CalendarDays,
-  Coffee,
   Loader2,
   MessageCircle,
   Settings,
@@ -11,6 +10,7 @@ import {
   Wallet,
   X,
 } from 'lucide-react';
+import { AkiLogo } from './components/AkiLogo';
 import { AuthScreen } from './components/AuthScreen';
 import { ChatPanel } from './components/ChatPanel';
 import { EditItemModal } from './components/EditItemModal';
@@ -196,7 +196,7 @@ export default function App() {
         const msg =
           err instanceof Error
             ? sanitizeText(err.message, 300)
-            : 'ไม่สามารถโหลดข้อมูลจากฐานข้อมูลได้ครับ';
+            : 'ไม่สามารถโหลดข้อมูลจากฐานข้อมูลได้ค่ะ';
         showToast('โหลดข้อมูลไม่สำเร็จ', msg);
       })
       .finally(() => {
@@ -245,7 +245,7 @@ export default function App() {
           for (const item of dueItems) {
             const key = `${item.id}_${item.date}_${item.time}`;
             updatedKeys.push(key);
-            const title = `ถึงเวลานัดแล้วครับ · ${item.time} น.`;
+            const title = `ถึงเวลานัดแล้วนะคะ · ${item.time} น.`;
             const body = item.title;
             if (currentSettings.soundEnabled) {
               playGentleBell();
@@ -288,8 +288,8 @@ export default function App() {
             (s) => !s.completed && s.date === today,
           ).length;
 
-          const title = 'สรุปยอดประจำวันจากน้อนอากิ้ครับ';
-          const body = `วันนี้ใช้จ่ายไป ฿${formatCurrency(todayExpense)} และมีนัดหมายค้างอีก ${pendingCount} รายการครับน้า`;
+          const title = 'สรุปยอดประจำวันจากน้อนอากิ้ค่ะ';
+          const body = `วันนี้ใช้จ่ายไป ฿${formatCurrency(todayExpense)} และมีนัดหมายค้างอีก ${pendingCount} รายการนะคะน้า~`;
           if (currentSettings.soundEnabled) {
             playGentleBell();
           }
@@ -339,7 +339,7 @@ export default function App() {
     const userMsg: ChatMessage = {
       id: generateId('msg'),
       role: 'user',
-      text: cleanText || 'ส่งรูปสลิปโอนเงินให้น้อนอากิ้ช่วยบันทึกครับ',
+      text: cleanText || 'ส่งรูปสลิปโอนเงินให้น้อนอากิ้ช่วยบันทึกนะคะ',
       timestamp: getLocalTimeString(),
       imagePreview: safePreview,
     };
@@ -364,7 +364,7 @@ export default function App() {
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data?.error || 'ไม่สามารถเชื่อมต่อกับน้อนอากิ้ได้ครับ');
+        throw new Error(data?.error || 'ไม่สามารถเชื่อมต่อกับน้อนอากิ้ได้ค่ะ');
       }
 
       const analyzed = data as AnalyzedResponse;
@@ -441,7 +441,7 @@ export default function App() {
       const assistantMsg: ChatMessage = {
         id: generateId('msg'),
         role: 'assistant',
-        text: sanitizeText(analyzed.reply, 2000) || 'จดให้เรียบร้อยแล้วครับน้า!',
+        text: sanitizeText(analyzed.reply, 2000) || 'อากิ้จดให้เรียบร้อยแล้วค่ะน้า~',
         timestamp: getLocalTimeString(),
         createdItems: createdRefs.length > 0 ? createdRefs : undefined,
       };
@@ -451,7 +451,7 @@ export default function App() {
       const errorText =
         err instanceof Error
           ? sanitizeText(err.message, 400)
-          : 'เกิดข้อผิดพลาดในการประมวลผลข้อความครับ';
+          : 'เกิดข้อผิดพลาดในการประมวลผลข้อความค่ะ';
       const errorMsg: ChatMessage = {
         id: generateId('msg'),
         role: 'assistant',
@@ -491,7 +491,7 @@ export default function App() {
     } catch (err: unknown) {
       showToast(
         'บันทึกรายการไม่สำเร็จ',
-        err instanceof Error ? sanitizeText(err.message, 250) : 'กรุณาลองใหม่อีกครั้งครับ',
+        err instanceof Error ? sanitizeText(err.message, 250) : 'ลองใหม่อีกครั้งนะคะ',
       );
     }
   };
@@ -506,7 +506,7 @@ export default function App() {
       setTransactions(prevList);
       showToast(
         'ลบรายการไม่สำเร็จ',
-        err instanceof Error ? sanitizeText(err.message, 250) : 'กรุณาลองใหม่อีกครั้งครับ',
+        err instanceof Error ? sanitizeText(err.message, 250) : 'ลองใหม่อีกครั้งนะคะ',
       );
     }
   };
@@ -531,7 +531,7 @@ export default function App() {
     } catch (err: unknown) {
       showToast(
         'บันทึกตารางเวลาไม่สำเร็จ',
-        err instanceof Error ? sanitizeText(err.message, 250) : 'กรุณาลองใหม่อีกครั้งครับ',
+        err instanceof Error ? sanitizeText(err.message, 250) : 'ลองใหม่อีกครั้งนะคะ',
       );
     }
   };
@@ -552,7 +552,7 @@ export default function App() {
       );
       showToast(
         'อัปเดตสถานะไม่สำเร็จ',
-        err instanceof Error ? sanitizeText(err.message, 250) : 'กรุณาลองใหม่อีกครั้งครับ',
+        err instanceof Error ? sanitizeText(err.message, 250) : 'ลองใหม่อีกครั้งนะคะ',
       );
     }
   };
@@ -567,7 +567,7 @@ export default function App() {
       setSchedules(prevList);
       showToast(
         'ลบตารางเวลาไม่สำเร็จ',
-        err instanceof Error ? sanitizeText(err.message, 250) : 'กรุณาลองใหม่อีกครั้งครับ',
+        err instanceof Error ? sanitizeText(err.message, 250) : 'ลองใหม่อีกครั้งนะคะ',
       );
     }
   };
@@ -590,7 +590,7 @@ export default function App() {
     } catch (err: unknown) {
       showToast(
         'บันทึกโน้ตไม่สำเร็จ',
-        err instanceof Error ? sanitizeText(err.message, 250) : 'กรุณาลองใหม่อีกครั้งครับ',
+        err instanceof Error ? sanitizeText(err.message, 250) : 'ลองใหม่อีกครั้งนะคะ',
       );
     }
   };
@@ -605,7 +605,7 @@ export default function App() {
       setNotes(prevList);
       showToast(
         'ลบโน้ตไม่สำเร็จ',
-        err instanceof Error ? sanitizeText(err.message, 250) : 'กรุณาลองใหม่อีกครั้งครับ',
+        err instanceof Error ? sanitizeText(err.message, 250) : 'ลองใหม่อีกครั้งนะคะ',
       );
     }
   };
@@ -626,7 +626,7 @@ export default function App() {
       setNotes([]);
       setMessages([
         createWelcomeMessage(
-          'ล้างข้อมูลทั้งหมดในบัญชีเรียบร้อยแล้วครับน้า! เริ่มจดรายการใหม่กับน้อนอากิ้ได้เลยครับ',
+          'ล้างข้อมูลทั้งหมดในบัญชีเรียบร้อยแล้วค่ะน้า~ เริ่มจดรายการใหม่กับน้อนอากิ้ได้เลยนะคะ',
         ),
       ]);
       try {
@@ -635,11 +635,11 @@ export default function App() {
       } catch {
         // Ignore
       }
-      showToast('ล้างข้อมูลทั้งหมดแล้วครับ', 'พื้นที่บันทึกพร้อมเริ่มใช้งานใหม่เรียบร้อยครับน้า');
+      showToast('ล้างข้อมูลทั้งหมดแล้วค่ะ', 'พื้นที่บันทึกพร้อมเริ่มใช้งานใหม่เรียบร้อยแล้วนะคะน้า~');
     } catch (err: unknown) {
       showToast(
         'ล้างข้อมูลไม่สำเร็จ',
-        err instanceof Error ? sanitizeText(err.message, 250) : 'กรุณาลองใหม่อีกครั้งครับ',
+        err instanceof Error ? sanitizeText(err.message, 250) : 'ลองใหม่อีกครั้งนะคะ',
       );
     }
   };
@@ -656,7 +656,7 @@ export default function App() {
     } catch (err: unknown) {
       showToast(
         'ออกจากระบบไม่สำเร็จ',
-        err instanceof Error ? sanitizeText(err.message, 250) : 'กรุณาลองใหม่อีกครั้งครับ',
+        err instanceof Error ? sanitizeText(err.message, 250) : 'ลองใหม่อีกครั้งนะคะ',
       );
     }
   };
@@ -669,10 +669,10 @@ export default function App() {
   if (authLoading) {
     return (
       <div className="h-[100dvh] bg-[#FAF7F2] text-[#5C4033] flex flex-col items-center justify-center gap-3 p-6">
-        <Coffee className="w-8 h-8" />
+        <AkiLogo className="w-14 h-14" />
         <div className="flex items-center gap-2 text-sm text-[#7A6356]">
           <Loader2 className="w-4 h-4 animate-spin text-[#5C4033]" />
-          <span>กำลังเตรียมพื้นที่ให้น้อนอากิ้ครับ...</span>
+          <span>กำลังเตรียมพื้นที่ให้น้อนอากิ้อยู่ค่ะ...</span>
         </div>
       </div>
     );
@@ -700,7 +700,7 @@ export default function App() {
       return (
         <div className="bg-white border border-[#EAE0D5] rounded-2xl p-10 flex flex-col items-center justify-center gap-3 text-sm text-[#7A6356]">
           <Loader2 className="w-5 h-5 animate-spin text-[#5C4033]" />
-          <span>น้อนอากิ้กำลังซิงค์ข้อมูลจากบัญชีของคุณครับ...</span>
+          <span>น้อนอากิ้กำลังซิงค์ข้อมูลจากบัญชีของคุณอยู่นะคะ...</span>
         </div>
       );
     }
@@ -740,10 +740,14 @@ export default function App() {
     <div className="h-[100dvh] flex flex-col bg-[#FAF7F2] text-[#2F2019] overflow-hidden">
       {/* Top Application Header */}
       <header className="h-[52px] lg:h-[56px] bg-white border-b border-[#EAE0D5] px-4 lg:px-6 flex items-center justify-between gap-4 shrink-0 sticky top-0 z-30">
-        <div className="flex items-center gap-2 shrink-0">
-          <Coffee className="w-5 h-5 text-[#5C4033]" />
-          <span className="text-base lg:text-lg font-bold tracking-tight text-[#5C4033] whitespace-nowrap">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <AkiLogo className="w-8 h-8 shrink-0" />
+          <span className="text-sm sm:text-base font-bold tracking-tight text-[#5C4033] truncate">
             น้อนอากิ้
+            <span className="hidden sm:inline font-medium text-[#7A6356]">
+              {' '}
+              — ผู้ช่วยส่วนตัวสุดน่ารัก
+            </span>
           </span>
         </div>
 

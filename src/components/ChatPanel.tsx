@@ -1,7 +1,6 @@
 import { ChangeEvent, FormEvent, KeyboardEvent, useEffect, useRef, useState } from 'react';
 import {
   CalendarClock,
-  Coffee,
   ImagePlus,
   Loader2,
   Pencil,
@@ -12,10 +11,10 @@ import {
   X,
 } from 'lucide-react';
 import {
-  AKI_AVATAR_URL,
   QUICK_PROMPTS,
   QuickPromptItem,
 } from '../data/initialData';
+import { AkiLogo } from './AkiLogo';
 import {
   ChatMessage,
   DashboardTab,
@@ -71,7 +70,6 @@ export function ChatPanel({
 }: ChatPanelProps) {
   const [inputText, setInputText] = useState('');
   const [attachedImage, setAttachedImage] = useState<AttachedImage | null>(null);
-  const [avatarFailed, setAvatarFailed] = useState(false);
   const [attachError, setAttachError] = useState('');
 
   const listEndRef = useRef<HTMLDivElement>(null);
@@ -165,25 +163,13 @@ export function ChatPanel({
       {/* Chat Panel Subheader */}
       <div className="px-4 py-3 border-b border-[#EAE0D5] flex items-center justify-between gap-3 shrink-0 bg-white">
         <div className="flex items-center gap-3 min-w-0">
-          {avatarFailed ? (
-            <div className="w-10 h-10 rounded-full bg-[#5C4033] text-white flex items-center justify-center shrink-0">
-              <Coffee className="w-5 h-5" />
-            </div>
-          ) : (
-            <img
-              src={AKI_AVATAR_URL}
-              alt="น้อนอากิ้ (Nong Aki)"
-              referrerPolicy="no-referrer"
-              onError={() => setAvatarFailed(true)}
-              className="w-10 h-10 rounded-full object-cover border border-[#EAE0D5] shrink-0"
-            />
-          )}
+          <AkiLogo className="w-10 h-10 shrink-0" />
           <div className="min-w-0">
             <h2 className="text-sm font-semibold text-[#2F2019] truncate">
-              น้อนอากิ้ (Nong Aki)
+              น้อนอากิ้
             </h2>
             <p className="text-xs text-[#7A6356] truncate">
-              พิมพ์คุย จดค่าข้าว นัดหมาย หรือส่งสลิปมาให้อากิ้ช่วยจดได้เลยครับ
+              พิมพ์คุย จดค่าข้าว นัดหมาย หรือส่งสลิปให้อากิ้ช่วยจดได้เลยนะคะ
             </p>
           </div>
         </div>
@@ -233,7 +219,7 @@ export function ChatPanel({
                             key={ref.id}
                             className="bg-white/70 border border-[#EAE0D5] rounded-xl px-3.5 py-2 text-xs text-[#9A8172]"
                           >
-                            ลบรายการการเงินนี้ออกจากระบบแล้วครับ
+                            ลบรายการการเงินนี้ออกจากระบบแล้วค่ะ
                           </div>
                         );
                       }
@@ -304,7 +290,7 @@ export function ChatPanel({
                             key={ref.id}
                             className="bg-white/70 border border-[#EAE0D5] rounded-xl px-3.5 py-2 text-xs text-[#9A8172]"
                           >
-                            ลบรายการตารางเวลานี้แล้วครับ
+                            ลบรายการตารางเวลานี้แล้วค่ะ
                           </div>
                         );
                       }
@@ -361,7 +347,7 @@ export function ChatPanel({
                           key={ref.id}
                           className="bg-white/70 border border-[#EAE0D5] rounded-xl px-3.5 py-2 text-xs text-[#9A8172]"
                         >
-                          ลบโน้ตนี้แล้วครับ
+                          ลบโน้ตนี้แล้วค่ะ
                         </div>
                       );
                     }
@@ -423,7 +409,7 @@ export function ChatPanel({
           <div className="flex items-start">
             <div className="bg-white border border-[#EAE0D5] rounded-2xl rounded-bl-sm px-4 py-3 flex items-center gap-2.5 text-sm text-[#7A6356]">
               <Loader2 className="w-4 h-4 animate-spin text-[#5C4033]" />
-              <span>น้อนอากิ้กำลังอ่านและแยกข้อมูลให้น้า...</span>
+              <span>น้อนอากิ้กำลังอ่านและแยกข้อมูลให้อยู่น้า~</span>
             </div>
           </div>
         )}
@@ -459,7 +445,7 @@ export function ChatPanel({
               />
               <div className="min-w-0">
                 <p className="text-xs font-medium text-[#2F2019] truncate">{attachedImage.label}</p>
-                <p className="text-[11px] text-[#7A6356]">พร้อมส่งให้น้อนอากิ้อ่านสลิปครับ</p>
+                <p className="text-[11px] text-[#7A6356]">พร้อมส่งให้น้อนอากิ้อ่านสลิปแล้วค่ะ</p>
               </div>
             </div>
             <button
@@ -509,7 +495,7 @@ export function ChatPanel({
                 listEndRef.current?.scrollIntoView({ behavior: 'smooth' });
               }, 150);
             }}
-            placeholder="พิมพ์คุยกับน้อนอากิ้ได้เลยครับ..."
+            placeholder="พิมพ์คุยกับน้อนอากิ้ได้เลยนะคะ..."
             className="flex-1 min-h-[44px] max-h-28 px-3.5 py-2.5 text-[16px] sm:text-sm bg-[#FAF7F2] border border-[#EAE0D5] rounded-xl text-[#2F2019] placeholder:text-[#9A8172] focus:outline-none focus:border-[#5C4033] focus:bg-white resize-none leading-snug touch-manipulation"
           />
 
