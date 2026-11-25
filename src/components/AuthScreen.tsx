@@ -120,7 +120,7 @@ export function AuthScreen() {
 
   return (
     <div className="min-h-dvh bg-[#FAF7F2] text-[#2F2019] flex flex-col items-center justify-center p-4 sm:p-6">
-      <div className="w-full max-w-md bg-white border border-[#EAE0D5] rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
+      <div className="w-full max-w-md bg-white border border-[#DFD1C2] rounded-2xl p-6 sm:p-8 shadow-md shadow-[#5C4033]/10 space-y-6">
         {/* Brand Header */}
         <div className="flex flex-col items-center text-center">
           <AkiLogo className="w-16 h-16 mb-3" />
@@ -133,13 +133,13 @@ export function AuthScreen() {
         </div>
 
         {/* Mode Switcher */}
-        <div className="grid grid-cols-2 gap-1 p-1 bg-[#FAF7F2] border border-[#EAE0D5] rounded-xl">
+        <div className="grid grid-cols-2 gap-1 p-1 bg-[#FAF7F2] border border-[#DFD1C2] rounded-xl">
           <button
             type="button"
             onClick={() => handleModeSwitch('login')}
-            className={`min-h-[42px] text-sm font-medium rounded-lg transition-colors cursor-pointer ${
+            className={`min-h-[42px] text-sm font-medium rounded-lg transition-all cursor-pointer ${
               mode === 'login'
-                ? 'bg-[#5C4033] text-white shadow-xs'
+                ? 'bg-gradient-to-r from-[#7A543E] to-[#5C4033] text-white shadow-sm shadow-[#5C4033]/20'
                 : 'text-[#7A6356] hover:text-[#2F2019]'
             }`}
           >
@@ -148,9 +148,9 @@ export function AuthScreen() {
           <button
             type="button"
             onClick={() => handleModeSwitch('register')}
-            className={`min-h-[42px] text-sm font-medium rounded-lg transition-colors cursor-pointer ${
+            className={`min-h-[42px] text-sm font-medium rounded-lg transition-all cursor-pointer ${
               mode === 'register'
-                ? 'bg-[#5C4033] text-white shadow-xs'
+                ? 'bg-gradient-to-r from-[#7A543E] to-[#5C4033] text-white shadow-sm shadow-[#5C4033]/20'
                 : 'text-[#7A6356] hover:text-[#2F2019]'
             }`}
           >
@@ -248,7 +248,7 @@ export function AuthScreen() {
           <button
             type="submit"
             disabled={busy}
-            className="w-full min-h-[46px] flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-[#5C4033] hover:bg-[#4A3228] disabled:opacity-60 rounded-xl transition-colors cursor-pointer disabled:cursor-not-allowed"
+            className="w-full min-h-[46px] flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-[#7A543E] to-[#5C4033] hover:from-[#6A4834] hover:to-[#4A3228] disabled:opacity-60 rounded-xl shadow-sm shadow-[#5C4033]/25 transition-all cursor-pointer disabled:cursor-not-allowed"
           >
             {loading && <Loader2 className="w-4 h-4 animate-spin" />}
             <span>{mode === 'login' ? 'เข้าสู่ระบบ' : 'สร้างบัญชีใหม่'}</span>

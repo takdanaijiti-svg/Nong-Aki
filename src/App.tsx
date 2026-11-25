@@ -770,7 +770,7 @@ export default function App() {
   return (
     <div className="h-[100dvh] flex flex-col bg-[#FAF7F2] text-[#2F2019] overflow-hidden">
       {/* Top Application Header */}
-      <header className="min-h-[54px] lg:h-[58px] bg-white border-b border-[#EAE0D5] px-4 lg:px-6 py-1.5 flex items-center justify-between gap-3 shrink-0 sticky top-0 z-30">
+      <header className="min-h-[54px] lg:h-[58px] bg-white border-b border-[#DFD1C2] shadow-sm shadow-[#5C4033]/5 px-4 lg:px-6 py-1.5 flex items-center justify-between gap-3 shrink-0 sticky top-0 z-30">
         <div className="flex items-center gap-2.5 min-w-0">
           <AkiLogo className="w-8 h-8 sm:w-9 sm:h-9 shrink-0" />
           <div className="min-w-0 flex flex-col sm:flex-row sm:items-baseline sm:gap-2">
@@ -786,7 +786,7 @@ export default function App() {
         {/* Desktop Dashboard Tab Switcher in Header */}
         <nav
           aria-label="หมวดหมู่แดชบอร์ด"
-          className="hidden lg:flex items-center gap-1 p-1 bg-[#FAF7F2] border border-[#EAE0D5] rounded-lg"
+          className="hidden lg:flex items-center gap-1 p-1 bg-[#FAF7F2] border border-[#DFD1C2] rounded-xl"
         >
           {dashboardTabs.map((tab) => {
             const Icon = tab.icon;
@@ -796,9 +796,9 @@ export default function App() {
                 key={tab.id}
                 type="button"
                 onClick={() => setDesktopTab(tab.id)}
-                className={`inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                className={`inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-medium rounded-lg transition-all whitespace-nowrap shrink-0 cursor-pointer ${
                   active
-                    ? 'bg-[#5C4033] text-white shadow-xs'
+                    ? 'bg-gradient-to-r from-[#7A543E] to-[#5C4033] text-white shadow-sm shadow-[#5C4033]/20'
                     : 'text-[#7A6356] hover:text-[#2F2019]'
                 }`}
               >
@@ -816,12 +816,12 @@ export default function App() {
           })}
         </nav>
 
-        {/* Settings Button (Top Right) */}
+        {/* Settings Button (Desktop Only - Top Right) */}
         <button
           type="button"
           onClick={() => setSettingsOpen(true)}
           aria-label="ตั้งค่าและการแจ้งเตือน"
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[38px] text-xs font-medium text-[#5C4033] bg-[#FAF7F2] hover:bg-[#F5ECE3] border border-[#EAE0D5] rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+          className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[38px] text-xs font-medium text-[#5C4033] bg-[#FAF7F2] hover:bg-[#F5ECE3] border border-[#DFD1C2] rounded-lg shadow-xs shadow-[#5C4033]/5 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
         >
           <Settings className="w-4 h-4" />
           <span>ตั้งค่า</span>
@@ -919,12 +919,12 @@ export default function App() {
         )}
       </main>
 
-      {/* Mobile Bottom Navigation Bar (4 Buttons) */}
+      {/* Mobile Bottom Navigation Bar (5 Buttons) */}
       <nav
         aria-label="เมนูนำทางหลัก"
-        className="lg:hidden shrink-0 z-20 bg-white/95 backdrop-blur-md border-t border-[#EAE0D5] pb-safe"
+        className="lg:hidden shrink-0 z-20 bg-white/95 backdrop-blur-md border-t border-[#DFD1C2] shadow-[0_-4px_14px_rgba(92,64,51,0.06)] pb-safe"
       >
-        <div className="grid grid-cols-4 h-[60px]">
+        <div className="grid grid-cols-5 h-[62px]">
           {(
             [
               { id: 'chat', label: 'แชท', icon: MessageCircle },
@@ -934,12 +934,15 @@ export default function App() {
             ] as const
           ).map((item) => {
             const Icon = item.icon;
-            const active = mobileTab === item.id;
+            const active = !settingsOpen && mobileTab === item.id;
             return (
               <button
                 key={item.id}
                 type="button"
-                onClick={() => setMobileTab(item.id)}
+                onClick={() => {
+                  setSettingsOpen(false);
+                  setMobileTab(item.id);
+                }}
                 className={`min-h-[44px] flex flex-col items-center justify-center gap-1 transition-colors cursor-pointer ${
                   active ? 'text-[#5C4033]' : 'text-[#9A8172] hover:text-[#5C4033]'
                 }`}
@@ -949,6 +952,20 @@ export default function App() {
               </button>
             );
           })}
+
+          <button
+            type="button"
+            onClick={() => setSettingsOpen(true)}
+            aria-label="ตั้งค่าและการแจ้งเตือน"
+            className={`min-h-[44px] flex flex-col items-center justify-center gap-1 transition-colors cursor-pointer ${
+              settingsOpen ? 'text-[#5C4033]' : 'text-[#9A8172] hover:text-[#5C4033]'
+            }`}
+          >
+            <Settings
+              className={`w-5 h-5 ${settingsOpen ? 'stroke-[2.25]' : 'stroke-[1.75]'}`}
+            />
+            <span className="text-[11px] font-medium whitespace-nowrap">ตั้งค่า</span>
+          </button>
         </div>
       </nav>
 

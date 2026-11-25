@@ -201,47 +201,47 @@ export function FinanceDashboard({
     <div className="space-y-6">
       {/* Top KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="bg-white border border-[#EAE0D5] rounded-xl p-4">
+        <div className="bg-white border border-[#DFD1C2] rounded-xl p-4 shadow-sm shadow-[#5C4033]/10">
           <p className="text-xs font-medium text-[#7A6356]">รายจ่ายวันนี้</p>
-          <p className="mt-1.5 text-xl sm:text-2xl font-semibold text-[#2F2019] font-mono tabular-nums">
+          <p className="mt-1.5 text-xl sm:text-2xl font-semibold text-[#C86432] font-mono tabular-nums">
             ฿{formatCurrency(summary.todayExpense)}
           </p>
-          <p className="mt-1 text-xs text-[#9A8172] font-mono tabular-nums">
+          <p className="mt-1 text-xs text-[#4A7842] font-medium font-mono tabular-nums">
             รับ +฿{formatCurrency(summary.todayIncome)}
           </p>
         </div>
 
-        <div className="bg-white border border-[#EAE0D5] rounded-xl p-4">
+        <div className="bg-white border border-[#DFD1C2] rounded-xl p-4 shadow-sm shadow-[#5C4033]/10">
           <p className="text-xs font-medium text-[#7A6356]">รายจ่ายเดือนนี้</p>
-          <p className="mt-1.5 text-xl sm:text-2xl font-semibold text-rose-700 font-mono tabular-nums">
+          <p className="mt-1.5 text-xl sm:text-2xl font-semibold text-[#C86432] font-mono tabular-nums">
             ฿{formatCurrency(summary.monthExpense)}
           </p>
           <p className="mt-1 text-xs text-[#9A8172]">รวมทุกหมวดหมู่</p>
         </div>
 
-        <div className="bg-white border border-[#EAE0D5] rounded-xl p-4">
+        <div className="bg-white border border-[#DFD1C2] rounded-xl p-4 shadow-sm shadow-[#5C4033]/10">
           <p className="text-xs font-medium text-[#7A6356]">รายรับเดือนนี้</p>
-          <p className="mt-1.5 text-xl sm:text-2xl font-semibold text-emerald-700 font-mono tabular-nums">
+          <p className="mt-1.5 text-xl sm:text-2xl font-semibold text-[#4A7842] font-mono tabular-nums">
             ฿{formatCurrency(summary.monthIncome)}
           </p>
           <p className="mt-1 text-xs text-[#9A8172]">เงินเข้าทั้งหมด</p>
         </div>
 
-        <div className="bg-[#5C4033] text-white rounded-xl p-4">
-          <p className="text-xs font-medium text-[#EADBC8]">คงเหลือเดือนนี้</p>
+        <div className="bg-gradient-to-br from-[#855E47] via-[#5C4033] to-[#432C22] text-white border border-[#6E4C3C] rounded-xl p-4 shadow-md shadow-[#5C4033]/25">
+          <p className="text-xs font-medium text-[#F3E5D8]">คงเหลือเดือนนี้</p>
           <p className="mt-1.5 text-xl sm:text-2xl font-semibold font-mono tabular-nums">
             {summary.monthNet < 0 ? '-' : ''}฿{formatCurrency(Math.abs(summary.monthNet))}
           </p>
-          <p className="mt-1 text-xs text-[#EADBC8]">รายรับหักรายจ่าย</p>
+          <p className="mt-1 text-xs text-[#E7D3C1]">รายรับหักรายจ่าย</p>
         </div>
       </div>
 
       {/* Separated Cash & Bank Wallets */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div className="bg-white border border-[#EAE0D5] rounded-xl p-4 flex items-center justify-between gap-3">
+        <div className="bg-white border border-[#DFD1C2] rounded-xl p-4 shadow-sm shadow-[#5C4033]/10 flex items-center justify-between gap-3">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-[#F5ECE3] text-[#5C4033] flex items-center justify-center shrink-0">
+              <div className="w-7 h-7 rounded-lg bg-[#F5ECE3] border border-[#E5D4C1] text-[#5C4033] flex items-center justify-center shrink-0">
                 <Landmark className="w-4 h-4" />
               </div>
               <p className="text-xs font-semibold text-[#5C4033]">เงินธนาคาร / โอน</p>
@@ -250,17 +250,22 @@ export function FinanceDashboard({
               {walletSummary.bankBalance < 0 ? '-' : ''}฿
               {formatCurrency(Math.abs(walletSummary.bankBalance))}
             </p>
-            <p className="mt-0.5 text-[11px] text-[#7A6356] font-mono tabular-nums">
-              รับ +฿{formatCurrency(walletSummary.bankIncome)} · จ่าย -฿
-              {formatCurrency(walletSummary.bankExpense)}
+            <p className="mt-0.5 text-[11px] font-mono tabular-nums text-[#7A6356]">
+              <span className="text-[#4A7842] font-medium">
+                รับ +฿{formatCurrency(walletSummary.bankIncome)}
+              </span>{' '}
+              ·{' '}
+              <span className="text-[#C86432] font-medium">
+                จ่าย -฿{formatCurrency(walletSummary.bankExpense)}
+              </span>
             </p>
           </div>
         </div>
 
-        <div className="bg-white border border-[#EAE0D5] rounded-xl p-4 flex items-center justify-between gap-3">
+        <div className="bg-white border border-[#DFD1C2] rounded-xl p-4 shadow-sm shadow-[#5C4033]/10 flex items-center justify-between gap-3">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-amber-50 border border-amber-200/70 text-amber-800 flex items-center justify-center shrink-0">
+              <div className="w-7 h-7 rounded-lg bg-[#FDF2EB] border border-[#F1D5C2] text-[#B85627] flex items-center justify-center shrink-0">
                 <Banknote className="w-4 h-4" />
               </div>
               <p className="text-xs font-semibold text-[#5C4033]">เงินสด</p>
@@ -269,29 +274,34 @@ export function FinanceDashboard({
               {walletSummary.cashBalance < 0 ? '-' : ''}฿
               {formatCurrency(Math.abs(walletSummary.cashBalance))}
             </p>
-            <p className="mt-0.5 text-[11px] text-[#7A6356] font-mono tabular-nums">
-              รับ +฿{formatCurrency(walletSummary.cashIncome)} · จ่าย -฿
-              {formatCurrency(walletSummary.cashExpense)}
+            <p className="mt-0.5 text-[11px] font-mono tabular-nums text-[#7A6356]">
+              <span className="text-[#4A7842] font-medium">
+                รับ +฿{formatCurrency(walletSummary.cashIncome)}
+              </span>{' '}
+              ·{' '}
+              <span className="text-[#C86432] font-medium">
+                จ่าย -฿{formatCurrency(walletSummary.cashExpense)}
+              </span>
             </p>
           </div>
         </div>
       </div>
 
       {/* Period Control & Chart Card */}
-      <div className="bg-white border border-[#EAE0D5] rounded-xl p-4 sm:p-5">
-        <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-[#F2EAE1]">
+      <div className="bg-white border border-[#DFD1C2] rounded-xl p-4 sm:p-5 shadow-sm shadow-[#5C4033]/10">
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-[#EFE5DA]">
           <div>
             <h2 className="text-base font-semibold text-[#2F2019]">สัดส่วนรายจ่ายแยกหมวดหมู่</h2>
             <p className="text-xs text-[#7A6356] mt-0.5">
               สรุปยอดรวม{' '}
-              <span className="font-mono tabular-nums font-semibold text-[#5C4033]">
+              <span className="font-mono tabular-nums font-semibold text-[#C86432]">
                 ฿{formatCurrency(totalPeriodExpense)}
               </span>
             </p>
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 p-1 bg-[#FAF7F2] border border-[#EAE0D5] rounded-lg">
+            <div className="flex items-center gap-1 p-1 bg-[#FAF7F2] border border-[#DFD1C2] rounded-lg">
               {(
                 [
                   { id: 'today', label: 'วันนี้' },
@@ -303,9 +313,9 @@ export function FinanceDashboard({
                   key={tab.id}
                   type="button"
                   onClick={() => setPeriod(tab.id)}
-                  className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap shrink-0 cursor-pointer ${
                     period === tab.id
-                      ? 'bg-[#5C4033] text-white shadow-xs'
+                      ? 'bg-gradient-to-r from-[#7A543E] to-[#5C4033] text-white shadow-xs shadow-[#5C4033]/20'
                       : 'text-[#7A6356] hover:text-[#2F2019]'
                   }`}
                 >
@@ -451,8 +461,8 @@ export function FinanceDashboard({
       </div>
 
       {/* Transaction Ledger */}
-      <div className="bg-white border border-[#EAE0D5] rounded-xl">
-        <div className="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-5 py-3.5 border-b border-[#F2EAE1]">
+      <div className="bg-white border border-[#DFD1C2] rounded-xl shadow-sm shadow-[#5C4033]/10">
+        <div className="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-5 py-3.5 border-b border-[#EFE5DA]">
           <div className="flex items-center gap-2">
             <h3 className="text-base font-semibold text-[#2F2019]">รายการย้อนหลัง</h3>
             <span className="text-xs font-mono tabular-nums text-[#9A8172]">
@@ -461,7 +471,7 @@ export function FinanceDashboard({
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <div className="flex items-center gap-1 p-1 bg-[#FAF7F2] border border-[#EAE0D5] rounded-lg">
+            <div className="flex items-center gap-1 p-1 bg-[#FAF7F2] border border-[#DFD1C2] rounded-lg">
               {(
                 [
                   { id: 'all', label: 'ทั้งหมด' },
@@ -473,9 +483,9 @@ export function FinanceDashboard({
                   key={t.id}
                   type="button"
                   onClick={() => setTypeFilter(t.id)}
-                  className={`px-2.5 py-1 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all whitespace-nowrap shrink-0 cursor-pointer ${
                     typeFilter === t.id
-                      ? 'bg-[#5C4033] text-white shadow-xs'
+                      ? 'bg-gradient-to-r from-[#7A543E] to-[#5C4033] text-white shadow-xs shadow-[#5C4033]/20'
                       : 'text-[#7A6356] hover:text-[#2F2019]'
                   }`}
                 >
@@ -484,7 +494,7 @@ export function FinanceDashboard({
               ))}
             </div>
 
-            <div className="flex items-center gap-1 p-1 bg-[#FAF7F2] border border-[#EAE0D5] rounded-lg">
+            <div className="flex items-center gap-1 p-1 bg-[#FAF7F2] border border-[#DFD1C2] rounded-lg">
               {(
                 [
                   { id: 'all', label: 'ทุกกระเป๋า' },
@@ -496,9 +506,9 @@ export function FinanceDashboard({
                   key={w.id}
                   type="button"
                   onClick={() => setWalletFilter(w.id)}
-                  className={`px-2.5 py-1 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all whitespace-nowrap shrink-0 cursor-pointer ${
                     walletFilter === w.id
-                      ? 'bg-[#C8A27C] text-white shadow-xs'
+                      ? 'bg-gradient-to-r from-[#D4AE87] to-[#B88B61] text-white shadow-xs'
                       : 'text-[#7A6356] hover:text-[#2F2019]'
                   }`}
                 >
@@ -510,7 +520,7 @@ export function FinanceDashboard({
             <button
               type="button"
               onClick={onAdd}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#5C4033] hover:bg-[#4A3228] rounded-lg transition-colors whitespace-nowrap shrink-0 min-h-[36px] cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-gradient-to-r from-[#7A543E] to-[#5C4033] hover:from-[#6A4834] hover:to-[#4A3228] rounded-lg shadow-sm shadow-[#5C4033]/20 transition-all whitespace-nowrap shrink-0 min-h-[36px] cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>เพิ่มรายการ</span>
@@ -527,7 +537,7 @@ export function FinanceDashboard({
             </p>
           </div>
         ) : (
-          <ul className="divide-y divide-[#F2EAE1]">
+          <ul className="divide-y divide-[#EFE5DA]">
             {visibleTransactions.map((tx) => {
               const isIncome = tx.type === 'income';
               const CatIcon = isIncome
@@ -541,10 +551,10 @@ export function FinanceDashboard({
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <div
-                      className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+                      className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 border ${
                         isIncome
-                          ? 'bg-emerald-50 text-emerald-700'
-                          : 'bg-[#FAF7F2] border border-[#EAE0D5] text-[#5C4033]'
+                          ? 'bg-[#EEF5EB] border-[#CFE0C9] text-[#4A7842]'
+                          : 'bg-[#FDF2EB] border-[#F1D5C2] text-[#C86432]'
                       }`}
                     >
                       <CatIcon className="w-4 h-4" />
@@ -573,8 +583,8 @@ export function FinanceDashboard({
                           })`}
                           className={`inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium rounded-md border transition-colors whitespace-nowrap cursor-pointer ${
                             tx.paymentMethod === 'cash'
-                              ? 'bg-amber-50 border-amber-200/80 text-amber-800 hover:bg-amber-100'
-                              : 'bg-[#FAF7F2] border-[#EAE0D5] text-[#5C4033] hover:bg-[#F5ECE3]'
+                              ? 'bg-[#FDF2EB] border-[#F1D5C2] text-[#B85627] hover:bg-[#FAE6D9]'
+                              : 'bg-[#FAF7F2] border-[#DFD1C2] text-[#5C4033] hover:bg-[#F5ECE3]'
                           }`}
                         >
                           {tx.paymentMethod === 'cash' ? (
@@ -596,7 +606,7 @@ export function FinanceDashboard({
                   <div className="flex items-center gap-2 shrink-0">
                     <span
                       className={`text-sm font-semibold font-mono tabular-nums ${
-                        isIncome ? 'text-emerald-700' : 'text-[#2F2019]'
+                        isIncome ? 'text-[#4A7842]' : 'text-[#C86432]'
                       }`}
                     >
                       {isIncome ? '+' : '-'}฿{formatCurrency(tx.amount)}

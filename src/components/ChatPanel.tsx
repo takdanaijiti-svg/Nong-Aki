@@ -173,10 +173,10 @@ export function ChatPanel({
               <div
                 className={`max-w-[88%] sm:max-w-[82%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
                   isUser
-                    ? 'bg-[#5C4033] text-white rounded-br-sm'
+                    ? 'bg-gradient-to-br from-[#7A543E] to-[#5C4033] text-white rounded-br-sm shadow-sm shadow-[#5C4033]/20'
                     : msg.isError
-                      ? 'bg-rose-50 border border-rose-200 text-rose-800 rounded-bl-sm'
-                      : 'bg-white border border-[#EAE0D5] text-[#2F2019] rounded-bl-sm'
+                      ? 'bg-rose-50 border border-rose-200 text-rose-800 rounded-bl-sm shadow-sm shadow-rose-900/5'
+                      : 'bg-white border border-[#DFD1C2] text-[#2F2019] rounded-bl-sm shadow-sm shadow-[#5C4033]/10'
                 }`}
               >
                 {safePreview && (
@@ -202,7 +202,7 @@ export function ChatPanel({
                         return (
                           <div
                             key={ref.id}
-                            className="bg-white/70 border border-[#EAE0D5] rounded-xl px-3.5 py-2 text-xs text-[#9A8172]"
+                            className="bg-white/80 border border-[#DFD1C2] rounded-xl px-3.5 py-2 text-xs text-[#9A8172] shadow-xs shadow-[#5C4033]/5"
                           >
                             ลบรายการการเงินนี้ออกจากระบบแล้วค่ะ
                           </div>
@@ -212,7 +212,7 @@ export function ChatPanel({
                       return (
                         <div
                           key={ref.id}
-                          className="bg-white border border-[#EAE0D5] rounded-xl p-3 flex items-center justify-between gap-2.5"
+                          className="bg-white border border-[#DFD1C2] rounded-xl p-3 shadow-sm shadow-[#5C4033]/10 flex items-center justify-between gap-2.5"
                         >
                           <button
                             type="button"
@@ -220,10 +220,10 @@ export function ChatPanel({
                             className="flex items-center gap-2.5 min-w-0 text-left flex-1 cursor-pointer group"
                           >
                             <div
-                              className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                              className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border ${
                                 isIncome
-                                  ? 'bg-emerald-50 text-emerald-700'
-                                  : 'bg-[#FAF7F2] border border-[#EAE0D5] text-[#5C4033]'
+                                  ? 'bg-[#EEF5EB] border-[#CFE0C9] text-[#4A7842]'
+                                  : 'bg-[#FDF2EB] border-[#F1D5C2] text-[#C86432]'
                               }`}
                             >
                               {tx.paymentMethod === 'cash' ? (
@@ -242,7 +242,7 @@ export function ChatPanel({
                                 {tx.title}{' '}
                                 <span
                                   className={`font-mono tabular-nums font-semibold ${
-                                    isIncome ? 'text-emerald-700' : 'text-[#5C4033]'
+                                    isIncome ? 'text-[#4A7842]' : 'text-[#C86432]'
                                   }`}
                                 >
                                   {isIncome ? '+' : '-'}฿{formatCurrency(tx.amount)}
@@ -288,7 +288,7 @@ export function ChatPanel({
                       return (
                         <div
                           key={ref.id}
-                          className="bg-white border border-[#EAE0D5] rounded-xl p-3 flex items-center justify-between gap-2.5"
+                          className="bg-white border border-[#DFD1C2] rounded-xl p-3 shadow-sm shadow-[#5C4033]/10 flex items-center justify-between gap-2.5"
                         >
                           <button
                             type="button"
@@ -345,7 +345,7 @@ export function ChatPanel({
                     return (
                       <div
                         key={ref.id}
-                        className="bg-white border border-[#EAE0D5] rounded-xl p-3 flex items-center justify-between gap-2.5"
+                        className="bg-white border border-[#DFD1C2] rounded-xl p-3 shadow-sm shadow-[#5C4033]/10 flex items-center justify-between gap-2.5"
                       >
                         <button
                           type="button"
@@ -398,7 +398,7 @@ export function ChatPanel({
 
         {isAnalyzing && (
           <div className="flex items-start">
-            <div className="bg-white border border-[#EAE0D5] rounded-2xl rounded-bl-sm px-4 py-3 flex items-center gap-2.5 text-sm text-[#7A6356]">
+            <div className="bg-white border border-[#DFD1C2] rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm shadow-[#5C4033]/10 flex items-center gap-2.5 text-sm text-[#7A6356]">
               <Loader2 className="w-4 h-4 animate-spin text-[#5C4033]" />
               <span>น้อนอากิ้กำลังอ่านและแยกข้อมูลให้อยู่น้า~</span>
             </div>
@@ -409,14 +409,14 @@ export function ChatPanel({
       </div>
 
       {/* Quick Prompts Bar (Mobile-First One-Handed Shortcuts) */}
-      <div className="relative z-20 px-3 py-2 bg-white border-t border-[#EAE0D5] flex items-center gap-2 overflow-x-auto shrink-0">
+      <div className="relative z-20 px-3 py-2 bg-white border-t border-[#DFD1C2] flex items-center gap-2 overflow-x-auto shrink-0">
         {QUICK_PROMPTS.map((item) => (
           <button
             key={item.label}
             type="button"
             disabled={isAnalyzing}
             onClick={() => handleQuickPrompt(item)}
-            className="px-3 py-1.5 min-h-[36px] text-xs font-medium text-[#5C4033] bg-[#FAF7F2] hover:bg-[#F5ECE3] border border-[#EAE0D5] rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-50"
+            className="px-3 py-1.5 min-h-[36px] text-xs font-medium text-[#5C4033] bg-[#FAF7F2] hover:bg-[#F5ECE3] border border-[#DFD1C2] rounded-lg shadow-xs shadow-[#5C4033]/5 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-50"
           >
             {item.label}
           </button>
@@ -424,15 +424,15 @@ export function ChatPanel({
       </div>
 
       {/* Bottom Composer */}
-      <div className="relative z-30 p-3 bg-white border-t border-[#EAE0D5] shrink-0">
+      <div className="relative z-30 p-3 bg-white border-t border-[#DFD1C2] shrink-0">
         {attachedImage && (
-          <div className="mb-2.5 flex items-center justify-between gap-2 p-2 bg-[#FAF7F2] border border-[#EAE0D5] rounded-xl">
+          <div className="mb-2.5 flex items-center justify-between gap-2 p-2 bg-[#FAF7F2] border border-[#DFD1C2] rounded-xl shadow-xs shadow-[#5C4033]/5">
             <div className="flex items-center gap-2.5 min-w-0">
               <img
                 src={attachedImage.preview}
                 alt={attachedImage.label}
                 referrerPolicy="no-referrer"
-                className="w-10 h-10 rounded-lg object-cover border border-[#EAE0D5] shrink-0"
+                className="w-10 h-10 rounded-lg object-cover border border-[#DFD1C2] shrink-0"
               />
               <div className="min-w-0">
                 <p className="text-xs font-medium text-[#2F2019] truncate">{attachedImage.label}</p>
@@ -470,7 +470,7 @@ export function ChatPanel({
             onClick={() => fileInputRef.current?.click()}
             aria-label="อัปโหลดรูปภาพหรือสลิปโอนเงิน"
             title="อัปโหลดรูปภาพ/สลิป"
-            className="min-w-[44px] min-h-[44px] flex items-center justify-center text-[#5C4033] bg-[#FAF7F2] hover:bg-[#F5ECE3] border border-[#EAE0D5] rounded-xl transition-colors shrink-0 cursor-pointer"
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center text-[#5C4033] bg-[#FAF7F2] hover:bg-[#F5ECE3] border border-[#DFD1C2] rounded-xl shadow-xs shadow-[#5C4033]/5 transition-colors shrink-0 cursor-pointer"
           >
             <ImagePlus className="w-5 h-5" />
           </button>
@@ -487,14 +487,14 @@ export function ChatPanel({
               }, 150);
             }}
             placeholder="พิมพ์คุยกับน้อนอากิ้ได้เลยนะคะ..."
-            className="flex-1 min-h-[44px] max-h-28 px-3.5 py-2.5 text-[16px] sm:text-sm bg-[#FAF7F2] border border-[#EAE0D5] rounded-xl text-[#2F2019] placeholder:text-[#9A8172] focus:outline-none focus:border-[#5C4033] focus:bg-white resize-none leading-snug touch-manipulation"
+            className="flex-1 min-h-[44px] max-h-28 px-3.5 py-2.5 text-[16px] sm:text-sm bg-[#FAF7F2] border border-[#DFD1C2] rounded-xl text-[#2F2019] placeholder:text-[#9A8172] focus:outline-none focus:border-[#5C4033] focus:bg-white resize-none leading-snug touch-manipulation"
           />
 
           <button
             type="submit"
             disabled={isAnalyzing || (!inputText.trim() && !attachedImage)}
             aria-label="ส่งข้อความ"
-            className="min-w-[44px] min-h-[44px] flex items-center justify-center bg-[#5C4033] hover:bg-[#4A3228] disabled:bg-[#EAE0D5] disabled:text-[#9A8172] text-white rounded-xl transition-colors shrink-0 cursor-pointer disabled:cursor-not-allowed"
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center bg-gradient-to-br from-[#7A543E] to-[#5C4033] hover:from-[#6B4834] hover:to-[#4A3228] disabled:bg-none disabled:bg-[#EAE0D5] disabled:text-[#9A8172] text-white rounded-xl shadow-sm shadow-[#5C4033]/20 disabled:shadow-none transition-all shrink-0 cursor-pointer disabled:cursor-not-allowed"
           >
             <SendHorizontal className="w-5 h-5" />
           </button>

@@ -205,13 +205,13 @@ export function EditItemModal({
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
           {target.kind === 'transaction' && (
             <>
-              <div className="grid grid-cols-2 gap-1 p-1 bg-[#FAF7F2] border border-[#EAE0D5] rounded-lg">
+              <div className="grid grid-cols-2 gap-1 p-1 bg-[#FAF7F2] border border-[#DFD1C2] rounded-lg">
                 <button
                   type="button"
                   onClick={() => setTxType('expense')}
-                  className={`py-2 text-xs font-medium rounded-md transition-colors cursor-pointer ${
+                  className={`py-2 text-xs font-medium rounded-md transition-all cursor-pointer ${
                     txType === 'expense'
-                      ? 'bg-[#5C4033] text-white shadow-xs'
+                      ? 'bg-gradient-to-r from-[#D57442] to-[#B85627] text-white shadow-xs'
                       : 'text-[#7A6356] hover:text-[#2F2019]'
                   }`}
                 >
@@ -220,9 +220,9 @@ export function EditItemModal({
                 <button
                   type="button"
                   onClick={() => setTxType('income')}
-                  className={`py-2 text-xs font-medium rounded-md transition-colors cursor-pointer ${
+                  className={`py-2 text-xs font-medium rounded-md transition-all cursor-pointer ${
                     txType === 'income'
-                      ? 'bg-emerald-700 text-white shadow-xs'
+                      ? 'bg-gradient-to-r from-[#5D8F54] to-[#4A7842] text-white shadow-xs'
                       : 'text-[#7A6356] hover:text-[#2F2019]'
                   }`}
                 >
@@ -438,7 +438,7 @@ export function EditItemModal({
             </button>
             <button
               type="submit"
-              className="px-5 py-2 text-sm font-medium text-white bg-[#5C4033] hover:bg-[#4A3228] rounded-lg transition-colors min-h-[40px] cursor-pointer"
+              className="px-5 py-2 text-sm font-medium text-white bg-gradient-to-r from-[#7A543E] to-[#5C4033] hover:from-[#6A4834] hover:to-[#4A3228] rounded-lg shadow-sm shadow-[#5C4033]/20 transition-all min-h-[40px] cursor-pointer"
             >
               บันทึก
             </button>

@@ -44,7 +44,7 @@ export function NotesDashboard({ notes, onAdd, onEdit, onDelete }: NotesDashboar
   return (
     <div className="space-y-5">
       {/* Search & Filter Header */}
-      <div className="bg-white border border-[#EAE0D5] rounded-xl p-4 space-y-3">
+      <div className="bg-white border border-[#DFD1C2] rounded-xl p-4 space-y-3 shadow-sm shadow-[#5C4033]/10">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="relative flex-1 min-w-[200px]">
             <Search className="w-4 h-4 text-[#9A8172] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -53,7 +53,7 @@ export function NotesDashboard({ notes, onAdd, onEdit, onDelete }: NotesDashboar
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="ค้นหาโน้ตหรือแท็ก..."
-              className="w-full pl-9 pr-8 py-2 text-sm bg-[#FAF7F2] border border-[#EAE0D5] rounded-lg text-[#2F2019] placeholder:text-[#9A8172] focus:outline-none focus:border-[#5C4033] focus:bg-white transition-colors"
+              className="w-full pl-9 pr-8 py-2 text-sm bg-[#FAF7F2] border border-[#DFD1C2] rounded-lg text-[#2F2019] placeholder:text-[#9A8172] focus:outline-none focus:border-[#5C4033] focus:bg-white transition-colors"
             />
             {search && (
               <button
@@ -70,7 +70,7 @@ export function NotesDashboard({ notes, onAdd, onEdit, onDelete }: NotesDashboar
           <button
             type="button"
             onClick={onAdd}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium text-white bg-[#5C4033] hover:bg-[#4A3228] rounded-lg transition-colors whitespace-nowrap shrink-0 min-h-[38px] cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium text-white bg-gradient-to-r from-[#7A543E] to-[#5C4033] hover:from-[#6A4834] hover:to-[#4A3228] rounded-lg shadow-sm shadow-[#5C4033]/20 transition-all whitespace-nowrap shrink-0 min-h-[38px] cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>จดโน้ตใหม่</span>
@@ -84,10 +84,10 @@ export function NotesDashboard({ notes, onAdd, onEdit, onDelete }: NotesDashboar
               key={tag}
               type="button"
               onClick={() => setSelectedTag(tag)}
-              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all whitespace-nowrap shrink-0 cursor-pointer ${
                 selectedTag === tag
-                  ? 'bg-[#5C4033] text-white'
-                  : 'bg-[#FAF7F2] border border-[#EAE0D5] text-[#7A6356] hover:bg-[#F5ECE3] hover:text-[#2F2019]'
+                  ? 'bg-gradient-to-r from-[#7A543E] to-[#5C4033] text-white shadow-xs shadow-[#5C4033]/20'
+                  : 'bg-[#FAF7F2] border border-[#DFD1C2] text-[#7A6356] hover:bg-[#F5ECE3] hover:text-[#2F2019]'
               }`}
             >
               {tag === 'ทั้งหมด' ? 'ทั้งหมด' : `#${tag}`}
@@ -98,7 +98,7 @@ export function NotesDashboard({ notes, onAdd, onEdit, onDelete }: NotesDashboar
 
       {/* Notes Card Grid */}
       {filteredNotes.length === 0 ? (
-        <div className="bg-white border border-[#EAE0D5] rounded-xl py-14 px-4 text-center">
+        <div className="bg-white border border-[#DFD1C2] rounded-xl py-14 px-4 text-center shadow-sm shadow-[#5C4033]/10">
           <StickyNote className="w-8 h-8 text-[#C8A27C] mx-auto mb-2.5" />
           <p className="text-sm font-medium text-[#2F2019]">ไม่พบบันทึกช่วยจำที่ตรงกับการค้นหาค่ะ</p>
           <p className="text-xs text-[#7A6356] mt-1">
@@ -112,7 +112,7 @@ export function NotesDashboard({ notes, onAdd, onEdit, onDelete }: NotesDashboar
             return (
               <article
                 key={note.id}
-                className="bg-white border border-[#EAE0D5] rounded-xl p-4 flex flex-col justify-between gap-4 hover:border-[#C8A27C] transition-colors"
+                className="bg-white border border-[#DFD1C2] rounded-xl p-4 shadow-sm shadow-[#5C4033]/10 flex flex-col justify-between gap-4 hover:border-[#C8A27C] hover:shadow-md hover:shadow-[#5C4033]/15 transition-all"
               >
                 <div>
                   <div className="flex items-start justify-between gap-2">
